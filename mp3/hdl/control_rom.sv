@@ -33,11 +33,13 @@ function void set_defaults();
     alumux2_sel = alumux::i_imm;
 endfunction
 
+/*signals being set to load regfile*/
 function void loadRegfile(regfilemux::regfilemux_sel_t sel);
     ctrl.load_regfile = 1'b1;
     ctrl.regfilemux_sel = sel;
 endfunction
 
+/*signals being set for ALU*/
 function void setALU(alumux::alumux1_sel_t sel1,
                 alumux::alumux2_sel_t sel2,
                 logic setop = 1'b0, alu_ops op = alu_add);
@@ -49,11 +51,13 @@ function void setALU(alumux::alumux1_sel_t sel1,
 
 endfunction
 
+/*signals being set for CMP to function*/
 function automatic void setCMP(cmpmux::cmpmux_sel_t sel, branch_funct3_t op);
     cmpmux_sel = sel;
     ctrl.cmpop = op;
 
 endfunction
+
 
 always_comb
 begin
@@ -81,11 +85,8 @@ begin
         op_load :
         begin
             setALU(alumux::rs1_out,alumux::i_imm,1'b1, alu_add);
-        end
-        op_store :
-        begin
-            setALU(alumux::rs1_out,alumux::s_imm,1'b1, alu_add);
-            unique case(load_funct3_t'(funct3))
+            ctrl.read = 1'b1;
+             unique case(load_funct3_t'(funct3))
                 lb:
                     loadRegfile(regfilemux::lb);
                 lh:
@@ -96,7 +97,12 @@ begin
                     loadRegfile(regfilemux::lbu);
                 lhu:
                     loadRegfile(regfilemux::lhu);   
-                default:;             
+                default:;   
+        end
+        op_store :
+        begin
+            setALU(alumux::rs1_out,alumux::s_imm,1'b1, alu_add);    
+            ctrl.write = 1'b1;
             endcase
         end
         op_imm :
