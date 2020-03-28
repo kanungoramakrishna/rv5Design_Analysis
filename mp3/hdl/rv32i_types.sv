@@ -74,7 +74,7 @@ typedef struct packed {
     rv32i_opcode opcode;
     alu_ops aluop;
     branch_funct3_t cmpop;
-    regfilemux_sel_t regfilemux_sel;  
+    regfilemux_sel_t regfilemux_sel;
 
     logic rv32i_reg rd;
     logic rv32i_word u_imm;
@@ -89,4 +89,3 @@ typedef struct packed {
 
 
 endpackage : rv32i_types
-
