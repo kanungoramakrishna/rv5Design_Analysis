@@ -27,7 +27,7 @@ function void set_defaults();
     ctrl.write = 1'b0;
     ctrl.u_imm = u_imm;
     ctrl.regfilemux_sel = regfilemux::alu_out;
-
+    ctrl.pcmux_sel = pcmux::pc_plus4;
     cmpmux_sel = cmpmux::rs2_out;
     alumux1_sel = alumux::rs1_out;
     alumux2_sel = alumux::i_imm;
@@ -81,6 +81,7 @@ begin
         begin
             setALU(alumux::pc_out,alumux::b_imm,1'b1,alu_add);
             setCMP(cmpmux::rs2_out,branch_funct3_t'(funct3));
+            ctrl.pcmux_sel = pcmux::alu_out;
         end
         op_load :
         begin

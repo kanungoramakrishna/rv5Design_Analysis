@@ -9,7 +9,7 @@ module instruction_execute
   input rv32i_word alu_in_1,
   input rv32i_word alu_in_2,
   input rv32i_word rs1_out,
-  input rv32i_word rs2_o,
+  input rv32i_word rs2,
   input rv32i_word cmp_in,
   input rv32i_control_word ctrl_word_in,
 
@@ -99,7 +99,7 @@ always_ff @(negedge clk) begin
     instruction_out <= instruction_in;
     PC_out <= PC;
     alu_out <= alu_o;
-    rs2_out <= rs2_o;
+    rs2_out <= rs2;
     br_en_out <= br_en;
     mem_byte_enable_out <= mem_byte_enable;
   end

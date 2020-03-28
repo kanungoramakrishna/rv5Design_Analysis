@@ -4,6 +4,8 @@ module instruction_decode
     input rst,
     input [31:0] PC,
     input [31:0] data_, // instruction that has been fetched from I cache
+    
+    //These inputs come from the WB stage
     input [31:0] rd_in,
     input [4:0] rd,
     input logic load_regfile,
