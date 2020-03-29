@@ -85,7 +85,7 @@ always_comb begin
   endcase
 end
 
-always_ff @(negedge clk) begin
+always_ff @(posedge clk) begin
   if (rst) begin
     ctrl_word_out <= 0;
     instruction_out <= 0;

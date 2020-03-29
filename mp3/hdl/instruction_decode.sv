@@ -91,7 +91,7 @@ begin
 end
 
 //registers ID/EXE
-always_ff @(negedge clk) //negedge triggered
+always_ff @(posedge clk) //posedge triggered
 begin
     if(rst)
       begin

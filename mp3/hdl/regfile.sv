@@ -12,7 +12,7 @@ module regfile
 //logic [31:0] data [32] /* synthesis ramstyle = "logic" */ = '{default:'0};
 logic [31:0] data [32];
 
-always_ff @(posedge clk)
+always_ff @(negedge clk)
 begin
     if (rst)
     begin

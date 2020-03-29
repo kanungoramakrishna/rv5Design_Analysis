@@ -35,7 +35,7 @@ pc_register PC (
 //        make it easier to expand upon later
 
 // IF/ID
-always_ff @(negedge clk) begin
+always_ff @(posedge clk) begin
 	// PC
 	if (rst) begin
 		pc_ff <= 32'b0;

@@ -36,7 +36,7 @@ assign data_read = ctrl_word_in.read;
 assign data_write = ctrl_word_in.write;
 
 //set state register outputs
-always_ff @(negedge clk) begin
+always_ff @(posedge clk) begin
   if (rst) begin
     ctrl_word_out <= 0;
     instruction_out <= 0;
