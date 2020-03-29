@@ -31,7 +31,7 @@ always_comb begin
       br_en = rs1_out < cmp_in ? 1'b0 : 1'b1;
     end
     default:
-      `BAD_OP;
+      br_en = rs1_out < cmp_in ? 1'b0 : 1'b1;
   endcase
 end
 endmodule
