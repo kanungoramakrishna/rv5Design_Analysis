@@ -53,7 +53,7 @@ always_ff @(posedge clk) begin
     mem_byte_enable_out <= mem_byte_enable_in;
     //rdata holds its value until resp goes high from memory, but for now we will always get once cycle hit
     r_data_out <= data_rdata_in;
-    br_en_out <= {br_en_in,31'b0};
+    br_en_out <= {31'b0,br_en_in}; 
     PC_plus4_out <= PC_in +4;
     PC_out <= PC_in;
     alu_output_out <= alu_output_in;
