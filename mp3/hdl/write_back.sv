@@ -93,7 +93,7 @@ begin
                 default: regfilemux_out = {{16{1'b0}},r_data_in[15:0]};
                 endcase
             end
-        default: `BAD_MUX_SEL;
+        default:;
     endcase
 end
 endmodule

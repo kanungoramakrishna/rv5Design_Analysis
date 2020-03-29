@@ -1,5 +1,5 @@
 import rv32i_types::*;
-
+import pcmux::*;
 module instruction_fetch
 (
 	// Pileline IO
@@ -18,8 +18,8 @@ module instruction_fetch
 );
 
 logic pc_load;
-logic pc_in;
-logic pc_out;
+rv32i_word pc_in;
+rv32i_word pc_out;
 
 pc_register PC (
 	.clk  (clk),

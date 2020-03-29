@@ -69,7 +69,7 @@ begin
     unique case (alumux1_sel)
         alumux::rs1_out: ALUin_1 = reg_a;
         alumux::pc_out: ALUin_1 = PC;
-        default: `BAD_MUX_SEL;
+        default: ALUin_1 = PC;
     endcase
 
     unique case (alumux2_sel)
@@ -79,13 +79,13 @@ begin
         alumux::s_imm: ALUin_2 = s_imm;
         alumux::j_imm: ALUin_2 = j_imm;
         alumux::rs2_out: ALUin_2 = reg_b;
-        default: `BAD_MUX_SEL;
+        default: ALUin_2 = reg_b;
     endcase
 
     unique case (cmpmux_sel)
         cmpmux::rs2_out: CMPin = reg_b;
         cmpmux::i_imm: CMPin = i_imm;
-        default: `BAD_MUX_SEL;
+        default: CMPin = i_imm;
     endcase
 
 end

@@ -85,7 +85,7 @@ logic [4:0] rd;
 
 //WB to IF for PC
 pcmux_sel_t pcmux_sel;
-logic alu_WB_IF;
+rv32i_word alu_WB_IF;
 
 /*****************************************************************************/
 

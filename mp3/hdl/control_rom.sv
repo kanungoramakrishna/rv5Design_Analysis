@@ -1,4 +1,6 @@
 import rv32i_types::*;
+import alumux::*;
+import cmpmux::*;
 
 module control_rom
 (

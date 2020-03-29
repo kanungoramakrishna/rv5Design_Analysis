@@ -18,8 +18,8 @@ module instruction_execute
   output rv32i_word PC_out,
   output rv32i_word alu_out,
   output rv32i_word rs2_out,
-  output br_en_out,
-  output [3:0] mem_byte_enable_out
+  output logic br_en_out,
+  output logic [3:0] mem_byte_enable_out
 );
 
 rv32i_word alu_o;
@@ -93,6 +93,7 @@ always_ff @(negedge clk) begin
     alu_out <= 0;
     rs2_out <= 0;
     br_en_out <= 0;
+    mem_byte_enable_out <= 0;
   end
   else begin
     ctrl_word_out <= ctrl_word_in;
