@@ -52,10 +52,11 @@ always_ff @(negedge clk) begin
     instruction_out <= instruction_in;
     mem_byte_enable_out <= mem_byte_enable_in;
     //rdata holds its value until resp goes high from memory, but for now we will always get once cycle hit
-    r_data_out <= data_resp ? data_rdata_in : data_rdata;
+    r_data_out <= data_resp ? data_rdata_in : r_data_out;
     br_en_out <= {br_en_in,31'b0};
     PC_plus4_out <= PC_in +4;
     PC_out <= PC_in;
     alu_output_out <= alu_output_in;
   end
 end
+endmodule

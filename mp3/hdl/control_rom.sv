@@ -4,11 +4,11 @@ module control_rom
 (
     input rv32i_word data,
     input [31:0] u_imm,
-    
+
     output rv32i_control_word ctrl,
     output alumux1_sel_t alumux1_sel,
     output alumux2_sel_t alumux2_sel,
-    output cmpmux_sel_t cmpmux_sel   
+    output cmpmux_sel_t cmpmux_sel
 );
 logic [2:0] funct3;
 logic [6:0] funct7;
@@ -22,7 +22,7 @@ function void set_defaults();
     ctrl.load_regfile = 1'b0;
     ctrl.rd = data[11:7];
     ctrl.cmpop = branch_funct3_t'(funct3);
-    ctrl.aluop = aluops::alu_add;
+    ctrl.aluop = alu_add;
     ctrl.read = 1'b0;
     ctrl.write = 1'b0;
     ctrl.u_imm = u_imm;
@@ -62,8 +62,8 @@ endfunction
 always_comb
 begin
     set_defaults();
-    /* Assign control signals based on opcode */    
-    case(opcode)
+    /* Assign control signals based on opcode */
+    case (ctrl.opcode)
         op_lui :
             loadRegfile(regfilemux::u_imm);
         op_auipc :
@@ -97,14 +97,14 @@ begin
                 lbu:
                     loadRegfile(regfilemux::lbu);
                 lhu:
-                    loadRegfile(regfilemux::lhu);   
-                default:;   
+                    loadRegfile(regfilemux::lhu);
+                default:;
+            endcase
         end
         op_store :
         begin
-            setALU(alumux::rs1_out,alumux::s_imm,1'b1, alu_add);    
+            setALU(alumux::rs1_out,alumux::s_imm,1'b1, alu_add);
             ctrl.write = 1'b1;
-            endcase
         end
         op_imm :
         begin

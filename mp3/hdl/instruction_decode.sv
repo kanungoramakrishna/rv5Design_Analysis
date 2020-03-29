@@ -1,12 +1,14 @@
 import rv32i_types::*;
+import alumux::*;
+import cmpmux::*;
 
 module instruction_decode
-(   
+(
     input  logic clk,
     input  logic rst,
     input  rv32i_word PC,
     input  rv32i_word data_, // instruction that has been fetched from I cache
-    
+
     //These inputs come from the WB stage
     input  rv32i_word  rd_in,
     input  logic [4:0] rd,
@@ -58,8 +60,8 @@ regfile regfile(
     .reg_b (reg_b )
 );
 
-//CW module 
-control_rom control_rom(.*);
+//CW module
+control_rom control_rom(.*, .data(data_));
 
 //ALU muxes 1 and 2 and CMP muxes
 always_comb
@@ -92,7 +94,7 @@ end
 always_ff @(negedge clk) //negedge triggered
 begin
     if(rst)
-    begin
+      begin
         PC_out <= 32'b0;
         instruction_out <= 32'b0;
         ctrl_out <= 0;
@@ -101,7 +103,9 @@ begin
         CMPin_out <= 32'b0;
         rs1_out <= 32'b0;
         rs2_out <= 32'b0;
+      end
     else
+      begin
         PC_out <= PC;
         instruction_out <= data_;
         ctrl_out <= ctrl;
@@ -109,6 +113,7 @@ begin
         ALUin_2_out <= ALUin_2;
         CMPin_out <= CMPin;
         rs1_out <= reg_a;
-        rs2_out <= reg_b;        
-    end
+        rs2_out <= reg_b;
+      end
 end
+endmodule

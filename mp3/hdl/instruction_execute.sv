@@ -27,7 +27,7 @@ logic [3:0] mem_byte_enable;
 logic br_en;
 
 alu alu (
-  .aluops (ctrl_word_in.aluop),
+  .aluop (ctrl_word_in.aluop),
   .a (alu_in_1),
   .b (alu_in_2),
   .f (alu_o)
@@ -43,10 +43,10 @@ always_comb begin
   //note that rs2 (write data) must be masked using byte enable,
   //done in mem_access stage to reduce logic in this stage
   //note that sw has same encoding as lw, etc. so we can account for both cases
-  unique case (instruction_in[14:12])
+  unique case (load_funct3_t'(instruction_in[14:12]))
     default:
       mem_byte_enable = 4'b1111;
-    load_funct3_t::lh:, load_funct3_t::lhu: begin
+    lh, lhu: begin
       unique case (alu_o[1:0])
         2'b00:
           mem_byte_enable = 4'b0011;
@@ -58,7 +58,7 @@ always_comb begin
           mem_byte_enable = 4'b1000;
       endcase
     end
-    load_funct3_t::lw: begin
+    lw: begin
       unique case (alu_o[1:0])
         2'b00:
           mem_byte_enable = 4'b1111;
@@ -70,7 +70,7 @@ always_comb begin
           mem_byte_enable = 4'b1000;
       endcase
     end
-    load_funct3_t::lb:, load_funct3_t::lbu: begin
+    lb, lbu: begin
       unique case (alu_o[1:0])
         2'b00:
           mem_byte_enable = 4'b0001;
@@ -97,7 +97,7 @@ always_ff @(negedge clk) begin
   else begin
     ctrl_word_out <= ctrl_word_in;
     instruction_out <= instruction_in;
-    PC_out <= PC;
+    PC_out <= PC_in;
     alu_out <= alu_o;
     rs2_out <= rs2;
     br_en_out <= br_en;

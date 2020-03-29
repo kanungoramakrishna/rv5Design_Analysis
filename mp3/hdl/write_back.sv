@@ -1,4 +1,5 @@
 import rv32i_types::*;
+import pcmux::*;
 
 module write_back
 (
@@ -11,7 +12,7 @@ module write_back
     input rv32i_word alu_in,
     input rv32i_word br_en_in,
 
-    
+
     //To regfile (ID)
     output logic load_regfile,
     output logic [31:0] rd_in,
@@ -20,14 +21,13 @@ module write_back
     //To PCmux (IF)
     output logic [31:0] alu_out_to_PC,
     output  pcmux_sel_t pcmux_sel
-
 );
 
 logic [31:0] regfilemux_out;
 
 //To IF
 assign alu_out_to_PC = alu_in;
-assign pcmux_sel = ctrl_word_in.pcmux_sel;
+//assign pcmux_sel = ctrl_word_in.pcmux_sel;
 
 //To ID to write to registers
 assign load_regfile = ctrl_word_in.load_regfile;
@@ -37,10 +37,11 @@ assign rd = ctrl_word_in.rd;
 //PCMUX_sel
 always_comb
 begin
-    if(br_en_in[0])
+    if(br_en_in[0]) begin
         pcmux_sel = ctrl_word_in.pcmux_sel;
     end
-        pcmux_sel = pcmux::pc_plus4;
+    else
+      pcmux_sel = pcmux::pc_plus4;
 
 end
 
@@ -54,7 +55,7 @@ begin
         regfilemux::u_imm    : regfilemux_out =  ctrl_word_in.u_imm;
         regfilemux::lw       : regfilemux_out = r_data_in;
         regfilemux::pc_plus4 : regfilemux_out = PC_plus4_in;
-        regfilemux::lb       : 
+        regfilemux::lb       :
             begin
                 unique case (mem_byte_enable_in)
                 4'b0001: regfilemux_out = {{24{r_data_in[7]}},r_data_in[7:0]};
@@ -64,7 +65,7 @@ begin
                 default: regfilemux_out = {{24{r_data_in[7]}},r_data_in[7:0]};
                 endcase
             end
-        regfilemux::lbu      : 
+        regfilemux::lbu      :
             begin
                 unique case (mem_byte_enable_in)
                 4'b0001: regfilemux_out = {{24{1'b0}},r_data_in[7:0]};
@@ -74,7 +75,7 @@ begin
                 default: regfilemux_out = {{24{1'b0}},r_data_in[7:0]};
                 endcase
             end
-        regfilemux::lh       : 
+        regfilemux::lh       :
             begin
                 unique case (mem_byte_enable_in)
                 4'b0011: regfilemux_out = {{16{r_data_in[15]}},r_data_in[15:0]};
@@ -83,7 +84,7 @@ begin
                 default: regfilemux_out = {{16{r_data_in[15]}},r_data_in[15:0]};
                 endcase
             end
-        regfilemux::lhu      : 
+        regfilemux::lhu      :
             begin
                 unique case (mem_byte_enable_in)
                 4'b0011: regfilemux_out = {{16{1'b0}},r_data_in[15:0]};
@@ -91,9 +92,8 @@ begin
                 4'b1100: regfilemux_out = {{16{1'b0}},r_data_in[31:16]};
                 default: regfilemux_out = {{16{1'b0}},r_data_in[15:0]};
                 endcase
-            end        
+            end
         default: `BAD_MUX_SEL;
     endcase
-
-
 end
+endmodule

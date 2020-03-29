@@ -3,7 +3,6 @@ package rv32i_types;
 // e.g. pcmux::pc_plus4 and regfilemux::pc_plus4 are seperate identifiers
 // for seperate enumerated types
 import pcmux::*;
-import marmux::*;
 import cmpmux::*;
 import alumux::*;
 import regfilemux::*;
@@ -76,8 +75,8 @@ typedef struct packed {
     branch_funct3_t cmpop;
     regfilemux_sel_t regfilemux_sel;
     pcmux_sel_t pcmux_sel;
-    logic rv32i_reg rd;
-    logic rv32i_word u_imm;
+    rv32i_reg rd;
+    rv32i_word u_imm;
 
     //control signals
     logic load_regfile;

@@ -1,5 +1,5 @@
 import rv32i_types::*;
-
+import pcmux::*;
 module mp3
 (
     input clk,
@@ -84,7 +84,7 @@ logic [31:0] rd_in;
 logic [4:0] rd;
 
 //WB to IF for PC
-logic pcmux_sel;
+pcmux_sel_t pcmux_sel;
 logic alu_WB_IF;
 
 /*****************************************************************************/
@@ -94,7 +94,7 @@ instruction_fetch IF(
     .rst        (rst ),
     .pcmux_sel  (pcmux_sel ),
     .alu_out    (alu_WB_IF ),
-    
+
     .inst_resp  (inst_resp),
     .inst_rdata (inst_rdata ),
     .inst_read  (inst_read ),
@@ -139,7 +139,7 @@ instruction_execute EXE(
     .rs2                   (rs2_ID_EXE),
     .cmp_in                (CMPin_ID_EXE),
     .ctrl_word_in          (ctrl_ID_EXE  ),
-    
+
     //Registered outputs
     .ctrl_word_out         (ctrl_EXE_MA ),
     .instruction_out       (instruction_EXE_MA),
@@ -169,7 +169,7 @@ memory_access MA(
     .data_mbe                   (data_mbe),
     .data_read                  (data_read),
     .data_write                 (data_write),
-    
+
     //Registered Outputs
     .ctrl_word_out              (ctrl_MA_WB ),
     .instruction_out            (instruction_MA_WB),
