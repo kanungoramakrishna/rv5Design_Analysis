@@ -32,6 +32,16 @@ assign load_regfile = ctrl_word_in.load_regfile;
 assign rd_in = regfilemux_out;
 assign rd = ctrl_word_in.rd;
 
+//PCMUX_sel
+always_comb
+begin
+    if(br_en_in[0])
+        pcmux_sel = ctrl_word_in.pcmux_sel;
+    end
+        pcmux_sel = pcmux::pc_plus4;
+
+end
+
 
 //Regfile MUX
 always_comb

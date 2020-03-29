@@ -43,7 +43,7 @@ always_comb begin
   //note that rs2 (write data) must be masked using byte enable,
   //done in mem_access stage to reduce logic in this stage
   //note that sw has same encoding as lw, etc. so we can account for both cases
-  unique case (data[14:12])
+  unique case (instruction_in[14:12])
     default:
       mem_byte_enable = 4'b1111;
     load_funct3_t::lh:, load_funct3_t::lhu: begin
