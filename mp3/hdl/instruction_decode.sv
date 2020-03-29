@@ -1,18 +1,20 @@
+import rv32i_types::*;
+
 module instruction_decode
 (   
-    input clk,
-    input rst,
-    input [31:0] PC,
-    input [31:0] data_, // instruction that has been fetched from I cache
+    input  logic clk,
+    input  logic rst,
+    input  rv32i_word PC,
+    input  rv32i_word data_, // instruction that has been fetched from I cache
     
     //These inputs come from the WB stage
-    input [31:0] rd_in,
-    input [4:0] rd,
-    input logic load_regfile,
+    input  rv32i_word  rd_in,
+    input  logic [4:0] rd,
+    input  logic       load_regfile,
 
     output rv32i_control_word ctrl_out,
-    output [31:0] instruction_out,
-    output [31:0] PC_out,
+    output rv32i_word instruction_out,
+    output rv32i_word PC_out,
     output rv32i_word ALUin_1_out,
     output rv32i_word ALUin_2_out,
     output rv32i_word CMPin_out,
@@ -21,11 +23,11 @@ module instruction_decode
 );
 
 
-logic [31:0] i_imm;
-logic [31:0] s_imm;
-logic [31:0] b_imm;
-logic [31:0] u_imm;
-logic [31:0] j_imm;
+rv32i_word i_imm;
+rv32i_word s_imm;
+rv32i_word b_imm;
+rv32i_word u_imm;
+rv32i_word j_imm;
 assign i_imm = {{21{data_[31]}}, data_[30:20]};
 assign s_imm = {{21{data_[31]}}, data_[30:25], data_[11:7]};
 assign b_imm = {{20{data_[31]}}, data_[7], data_[30:25], data_[11:8], 1'b0};

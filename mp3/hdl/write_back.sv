@@ -1,3 +1,5 @@
+import rv32i_types::*;
+
 module write_back
 (
     input rv32i_word PC_in,

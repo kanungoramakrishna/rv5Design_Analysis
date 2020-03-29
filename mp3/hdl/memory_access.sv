@@ -1,3 +1,5 @@
+import rv32i_types::*;
+
 module memory_access
 (
 input clk,
