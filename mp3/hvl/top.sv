@@ -52,6 +52,7 @@ mp3 dut(
 
 // Set this to the proper value
 assign itf.registers = dut.ID.regfile.data;
+assign rvfi.halt = (dut.ID.regfile.data[1] == 32'h600D600d); 
 //assign rvfi.halt = dut.instruction_fetch.pc_load & (dut.instruction_fetch.pc_ff == dut.instruction_fetch.pc_out);
 /***************************** End Instantiation *****************************/
 
