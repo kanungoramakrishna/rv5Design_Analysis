@@ -52,16 +52,16 @@ logic LD_data0, LD_data1, LD_data2, LD_data3, LD_read, LD_write, LD_address, LD_
 logic [255:0] line_data;
 
 //blocks for reading from memory to cache
-reg_block #(64) block0(.*, .LD_data(LD_data0), .reset(~reset_n), .data_in(burst_i), .data_out(line_o[63:0]));
-reg_block #(64) block1(.*, .LD_data(LD_data1), .reset(~reset_n), .data_in(burst_i), .data_out(line_o[127:64]));
-reg_block #(64) block2(.*, .LD_data(LD_data2), .reset(~reset_n), .data_in(burst_i), .data_out(line_o[191:128]));
-reg_block #(64) block3(.*, .LD_data(LD_data3), .reset(~reset_n), .data_in(burst_i), .data_out(line_o[255:192]));
+reg_block #(64) block0(.*, .LD_data(LD_data0), .reset(reset_n), .data_in(burst_i), .data_out(line_o[63:0]));
+reg_block #(64) block1(.*, .LD_data(LD_data1), .reset(reset_n), .data_in(burst_i), .data_out(line_o[127:64]));
+reg_block #(64) block2(.*, .LD_data(LD_data2), .reset(reset_n), .data_in(burst_i), .data_out(line_o[191:128]));
+reg_block #(64) block3(.*, .LD_data(LD_data3), .reset(reset_n), .data_in(burst_i), .data_out(line_o[255:192]));
 
-reg_block #(1) read_ff(.*, .LD_data(LD_read), .reset(~reset_n), .data_in(read_i), .data_out(read_active));
-reg_block #(1) write_ff(.*, .LD_data(LD_write), .reset(~reset_n), .data_in(write_i), .data_out(write_active));
+reg_block #(1) read_ff(.*, .LD_data(LD_read), .reset(reset_n), .data_in(read_i), .data_out(read_active));
+reg_block #(1) write_ff(.*, .LD_data(LD_write), .reset(reset_n), .data_in(write_i), .data_out(write_active));
 
-reg_block #(32) address_ff(.*, .LD_data(LD_address), .reset(~reset_n), .data_in(address_i), .data_out(address_o));
-reg_block #(256) line_ff(.*, .LD_data(LD_line), .reset(~reset_n), .data_in(line_i), .data_out(line_data));
+reg_block #(32) address_ff(.*, .LD_data(LD_address), .reset(reset_n), .data_in(address_i), .data_out(address_o));
+reg_block #(256) line_ff(.*, .LD_data(LD_line), .reset(reset_n), .data_in(line_i), .data_out(line_data));
 
 
 
@@ -69,7 +69,7 @@ reg_block #(256) line_ff(.*, .LD_data(LD_line), .reset(~reset_n), .data_in(line_
 enum logic [2:0] {HALT, BURST0, BURST1, BURST2, BURST3, DONE} curr_state, next_state;
 
 always_ff @(posedge clk) begin
-  if (~reset_n)
+  if (reset_n)
     curr_state <= HALT;
   else
     curr_state <= next_state;

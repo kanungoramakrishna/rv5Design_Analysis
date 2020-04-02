@@ -28,7 +28,7 @@ logic [width-1:0] data [num_sets-1:0] /* synthesis ramstyle = "logic" */;
 logic [width-1:0] _dataout;
 assign dataout = _dataout;
 
-always_ff @(posedge clk)
+always_ff @(posedge clk) //negedge
 begin
     if (rst) begin
         for (int i = 0; i < num_sets; ++i)
