@@ -200,4 +200,4 @@ write_back WB(
 );
 
 
-endmodule : mp3
+endmodule : cpu

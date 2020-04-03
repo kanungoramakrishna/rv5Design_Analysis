@@ -152,7 +152,7 @@ always_comb begin
     endcase
 end
 
-always_ff @(negedge clk) // posedge
+always_ff @(posedge clk) // posedge
 begin
   if (rst)
   begin
@@ -166,7 +166,7 @@ begin
   end
 end
 
-always_ff @(negedge clk) //posedge
+always_ff @(posedge clk) //posedge
 begin
     if(rst)
     begin
@@ -176,7 +176,7 @@ begin
         data_arr_in <= data_arr_in_value;
 end
 
-always_ff @(negedge clk) // posedge
+always_ff @(posedge clk) // posedge
 begin
   if (rst)
   begin
@@ -191,7 +191,7 @@ begin
 end
 
 
-always_ff @(negedge clk) // posedge
+always_ff @(posedge clk) // posedge
 begin
   if (rst)
   begin
@@ -218,4 +218,4 @@ function void set_defaults();
 endfunction
 
 
-endmodule : cache_datapath
+endmodule : datacache_datapath

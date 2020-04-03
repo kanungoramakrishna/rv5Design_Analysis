@@ -1,6 +1,6 @@
 import rv32i_types::*;
 
-module data_cache #(
+module datacache #(
     parameter s_offset = 5,
     parameter s_index  = 3,
     parameter s_tag    = 32 - s_offset - s_index,
@@ -72,4 +72,4 @@ datacache_bus_adapter bus_adapter (
   .address (mem_address_copy)
 );
 
-endmodule : cache
+endmodule : datacache
