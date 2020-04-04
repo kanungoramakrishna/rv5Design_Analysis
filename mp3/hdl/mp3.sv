@@ -31,12 +31,15 @@ logic [31:0] data_rdata;
 //Arbiter Signals
 
 
+// arbiter arbiter (
+//   .*,
+//   .mem_resp
+// );
 
-cpu(.*);
+cpu cpu(.*);
 
 
-datacache 
-datacache(
+datacache datacache(
 	.clk                (clk),
     .rst                (rst),
     .mem_address        (data_addr ),
@@ -54,8 +57,7 @@ datacache(
     .mem_resp           (data_resp)
 );
 
-instcache 
-instcache(
+instcache instcache(
 	.clk            (clk),
     .rst            (rst),
     .mem_address    (inst_addr),
