@@ -57,8 +57,9 @@ always_comb begin
 	inst_addr = pc_out;
 
 	unique case (pcmux_sel)
-		pcmux::pc_plus4: pc_in = pc_out + 4;
+		pcmux::pc_plus4 : pc_in = pc_out + 4;
 		pcmux::alu_out  : pc_in = alu_out;
+		pcmux::alu_mod2 : pc_in = {alu_out[31:1], 1'b0};
 		default  : pc_in = 32'hFFFFFFFF;	// Break on bad sel
 	endcase
 end

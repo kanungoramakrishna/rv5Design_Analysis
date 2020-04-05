@@ -73,12 +73,20 @@ begin
             loadRegfile(regfilemux::alu_out);
             setALU(alumux::pc_out,alumux::u_imm,1'b1,alu_add);
         end
-        /*op_jal :
-
-
+        op_jal :
+        begin
+            loadRegfile(regfilemux::pc_plus4);
+            setALU(alumux::pc_out, alumux::j_imm,1'b1, alu_add); 
+            ctrl.pcmux_sel = pcmux::alu_out; 
+        end
         op_jalr :
+        begin
+            loadRegfile(regfilemux::pc_plus4);
+            setALU(alumux::rs1_out, alumux::i_imm,1'b1 alu_add);
+            ctrl.pcmux_sel = pcmux::alu_mod2; 
+        end
 
-        */
+        
         op_br :
         begin
             setALU(alumux::pc_out,alumux::b_imm,1'b1,alu_add);
