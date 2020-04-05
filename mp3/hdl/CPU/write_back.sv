@@ -37,7 +37,7 @@ assign rd = ctrl_word_in.rd;
 //PCMUX_sel
 always_comb
 begin
-    if(br_en_in[0]) begin
+    if(br_en_in[0] || ctrl_word_in.opcode == op_jal || ctrl_word_in.opcode == op_jalr) begin
         pcmux_sel = ctrl_word_in.pcmux_sel;
     end
     else
