@@ -22,7 +22,7 @@ ldr_str_test:
    nop
    lw x1, %lo(W)(x8)
    lw x3, %lo(Y)(x8)
-   # cache line boundary
+   # cache line boundary (a0)
    lw x2, %lo(X)(x8)
    lw x4, %lo(Z)(x8)
    nop
@@ -31,7 +31,7 @@ ldr_str_test:
    sw x3, %lo(X)(x8)
    sw x4, %lo(W)(x8)
    nop
-   # cache line boundary
+   # cache line boundary (c0)
    lw x1, %lo(W)(x8)
    lw x2, %lo(X)(x8)
    lw x3, %lo(Y)(x8)
@@ -79,7 +79,7 @@ inf:
    nop
    nop
    # cache line boundary
-	
+
 .section .rodata
 .balign 256
 DataSeg:
