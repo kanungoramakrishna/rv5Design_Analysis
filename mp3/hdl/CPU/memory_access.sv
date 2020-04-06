@@ -13,6 +13,7 @@ input rv32i_word alu_output_in,
 input logic br_en_in,
 input rv32i_word data_rdata_in, //read word from memory
 input data_resp,
+input logic IF_stall,
 
 output logic [31:0] data_addr,
 output logic [31:0] data_wdata,
@@ -26,7 +27,8 @@ output logic [31:0] r_data_out, //output to next stage, not output to memory
 output logic [31:0] br_en_out,
 output logic [31:0] PC_plus4_out,
 output logic [31:0] PC_out,
-output logic [31:0] alu_output_out
+output logic [31:0] alu_output_out,
+output logic MA_stall
 );
 
 assign data_addr = {alu_output_in[31:2], 2'b00};
@@ -35,6 +37,18 @@ assign data_wdata = rs2_out;
 assign data_read = ctrl_word_in.read;
 assign data_write = ctrl_word_in.write;
 
+always_comb 
+begin
+  if((ctrl_word_in.read || ctrl_word_in.write))
+  begin
+      if (data_resp)
+        MA_stall = 1'b0;
+      else
+        MA_stall = 1'b1;
+  end
+  else
+    MA_stall = 1'b0;
+end
 //set state register outputs
 always_ff @(posedge clk) begin
   if (rst) begin
@@ -47,7 +61,7 @@ always_ff @(posedge clk) begin
     PC_plus4_out <= 0;
     alu_output_out <= 0;
   end
-  else begin
+  else if (!(IF_stall || MA_stall)) begin
     ctrl_word_out <= ctrl_word_in;
     instruction_out <= instruction_in;
     mem_byte_enable_out <= mem_byte_enable_in;

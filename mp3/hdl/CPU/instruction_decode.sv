@@ -8,7 +8,8 @@ module instruction_decode
     input  logic rst,
     input  rv32i_word PC,
     input  rv32i_word data_, // instruction that has been fetched from I cache
-
+    input  IF_stall,
+    input MA_stall,
     //These inputs come from the WB stage
     input  rv32i_word  rd_in,
     input  logic [4:0] rd,
@@ -104,7 +105,7 @@ begin
         rs1_out <= 32'b0;
         rs2_out <= 32'b0;
       end
-    else
+    else if (!(IF_stall || MA_stall))
       begin
         PC_out <= PC;
         instruction_out <= data_;

@@ -87,9 +87,13 @@ logic [4:0] rd;
 pcmux_sel_t pcmux_sel;
 rv32i_word alu_WB_IF;
 
+//stall, these are .*
+logic IF_stall;
+logic MA_stall;
 /*****************************************************************************/
 
 instruction_fetch IF(
+    .*,
 	.clk        (clk ),
     .rst        (rst ),
     .pcmux_sel  (pcmux_sel ),
@@ -106,6 +110,7 @@ instruction_fetch IF(
 );
 
 instruction_decode ID(
+    .*,
 	.clk (clk ),
     .rst (rst ),
     .PC  (PC_IF_DE ),
@@ -128,6 +133,7 @@ instruction_decode ID(
 
 
 instruction_execute EXE(
+    .*,
 	.clk                   (clk),
     .rst                   (rst),
 
@@ -151,6 +157,7 @@ instruction_execute EXE(
 );
 
 memory_access MA(
+    .*,
 	.clk                        (clk),
     .rst                        (rst),
 

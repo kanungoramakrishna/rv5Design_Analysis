@@ -27,6 +27,15 @@ enum logic [3:0] {
 IDLE, CHECK, BUFFER, WRITE_TO_MEM, READ_FROM_MEM
 } state, next_state;
 
+//Logic to keep track if the previous value was a HIT
+logic HIT_temp;
+always_ff @(posedge clk)
+begin
+    if(rst)
+        HIT_temp <= 1'b0;
+    else
+        HIT_temp<= HIT;
+end
 
 //update state
 always_ff @(negedge clk) begin //negedge
@@ -48,9 +57,9 @@ always_comb begin
         CHECK:  
         begin
         //Logic for the pipeline only
-        if ((HIT) && (!(mem_read_cpu || mem_write_cpu)))
+        if ((!(mem_read_cpu || mem_write_cpu)))
             next_state = IDLE;
-        if (!HIT)
+        else if (!HIT_temp)
             next_state = BUFFER;
         else 
             next_state = CHECK; 

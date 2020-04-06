@@ -22,10 +22,7 @@ begin
     begin
         data <= in;
     end
-    else
-    begin
-        data <= data;
-    end
+
 end
 
 always_comb

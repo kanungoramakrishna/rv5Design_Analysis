@@ -5,6 +5,7 @@ module instruction_fetch
 	// Pileline IO
 	input  logic       clk,
 	input  logic       rst,
+	input logic MA_stall,
 	input  pcmux_sel_t pcmux_sel, 	// From WB
 	input  rv32i_word alu_out,		// From WB
 	output rv32i_word pc_ff,
@@ -14,12 +15,17 @@ module instruction_fetch
 	input  logic       inst_resp,
 	input  rv32i_word inst_rdata,
 	output logic       inst_read,
-	output rv32i_word inst_addr
+	output rv32i_word inst_addr,
+	output logic IF_stall
 );
 
 logic pc_load;
 rv32i_word pc_in;
 rv32i_word pc_out;
+
+assign pc_load = (!(IF_stall || MA_stall));			// Always increment (?)
+assign inst_read = 1'b1;		// Always read (?)
+assign inst_addr = pc_out;
 
 pc_register PC (
 	.clk  (clk),
@@ -39,22 +45,29 @@ always_ff @(posedge clk) begin
 	// PC
 	if (rst) begin
 		pc_ff <= 32'b0;
-	end else begin
+	end 
+	else if (!(IF_stall || MA_stall)) begin
 		pc_ff <= pc_out;
 	end
 
 	// Instruction Data
 	if (rst) begin
 		instr_ff <= 32'b0;
-	end else begin
+	end 
+	else if (!(IF_stall || MA_stall)) begin
 		instr_ff <= inst_rdata;
 	end
 end
 
-always_comb begin
-	pc_load = 1'b1;			// Always increment (?)
-	inst_read = 1'b1;		// Always read (?)
-	inst_addr = pc_out;
+always_comb begin	
+	if (inst_resp)
+	begin
+		IF_stall = 1'b0;
+	end
+	else
+	begin
+		IF_stall = 1'b1;
+	end
 
 	unique case (pcmux_sel)
 		pcmux::pc_plus4 : pc_in = pc_out + 4;

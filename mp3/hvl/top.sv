@@ -27,6 +27,20 @@ always @(posedge itf.clk iff rvfi.commit) rvfi.order <= rvfi.order + 1; // Modif
 
 /********************* Assign Shadow Memory Signals Here *********************/
 // This section not required until CP2
+/* I Cache Ports */
+assign itf.inst_read = dut.cpu.inst_read;
+assign itf.inst_addr = dut.cpu.inst_addr;
+assign itf.inst_resp = dut.cpu.inst_resp;
+assign itf.inst_rdata = dut.cpu.inst_rdata;
+
+/* D Cache Ports */
+assign itf.data_read = dut.cpu.data_read;
+assign itf.data_write = dut.cpu.data_write;
+assign itf.data_mbe =  dut.cpu.data_mbe;
+assign itf.data_addr = dut.cpu.data_addr;
+assign itf.data_wdata = dut.cpu.data_wdata;
+assign itf.data_resp = dut.cpu.data_resp;
+assign itf.data_rdata = dut.cpu.data_rdata;
 /*********************** End Shadow Memory Assignments ***********************/
 
 
@@ -36,24 +50,17 @@ mp3 dut(
   .clk (itf.clk),
   .rst (itf.rst),
 
-  .inst_read (itf.inst_read),
-  .inst_addr (itf.inst_addr),
-  .inst_resp (itf.inst_resp),
-  .inst_rdata (itf.inst_rdata),
-
-  .data_read (itf.data_read),
-  .data_write (itf.data_write),
-  .data_mbe (itf.data_mbe),
-  .data_addr (itf.data_addr),
-  .data_wdata (itf.data_wdata),
-  .data_resp (itf.data_resp),
-  .data_rdata (itf.data_rdata)
+  .pmem_resp(itf.mem_resp),
+  .pmem_rdata(itf.mem_rdata),
+  .pmem_read(itf.mem_read),
+  .pmem_write(itf.mem_write),
+  .pmem_address(itf.mem_addr),
+  .pmem_wdata(itf.mem_wdata)
 );
 
 // Set this to the proper value
-assign itf.registers = dut.ID.regfile.data;
-assign rvfi.halt = (dut.ID.regfile.data[1] == 32'h600D600d); 
-//assign rvfi.halt = dut.instruction_fetch.pc_load & (dut.instruction_fetch.pc_ff == dut.instruction_fetch.pc_out);
+assign itf.registers = dut.cpu.ID.regfile.data;
+assign rvfi.halt = dut.cpu.IF.pc_load & (dut.cpu.IF.pc_ff > dut.cpu.IF.pc_out);
 /***************************** End Instantiation *****************************/
 
 endmodule
