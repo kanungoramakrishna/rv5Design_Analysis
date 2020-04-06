@@ -82,7 +82,7 @@ begin
         op_jalr :
         begin
             loadRegfile(regfilemux::pc_plus4);
-            setALU(alumux::rs1_out, alumux::i_imm,1'b1 alu_add);
+            setALU(alumux::rs1_out, alumux::i_imm,1'b1, alu_add);
             ctrl.pcmux_sel = pcmux::alu_mod2; 
         end
 

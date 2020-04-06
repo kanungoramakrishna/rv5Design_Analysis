@@ -19,8 +19,21 @@ module instcache_control (
 
 //use state machine for control logic with 2 always form
 
+//Logic to keep track if the previous value was a HIT was befor the CPU brings in 
+//the new instruction and the address and tag value changes
+logic HIT_temp;
+always_ff @(posedge clk)
+begin
+    if(rst)
+        HIT_temp <= 1'b0;
+    else
+        HIT_temp<= HIT;
+end
+
+
+
 enum logic [3:0] {
-IDLE, CHECK, BUFFER, WRITE_TO_MEM, READ_FROM_MEM
+IDLE, CHECK, READ_FROM_MEM
 } state, next_state;
 
 
@@ -44,9 +57,9 @@ always_comb begin
         CHECK:  
         begin
         //Logic for the pipeline only
-        if ((HIT) && (!(mem_read_cpu)))
+        if ((!(mem_read_cpu)))
             next_state = IDLE;
-        else if (!HIT)
+        else if (!HIT_temp)
             next_state = READ_FROM_MEM;
         else 
             next_state = CHECK; 
