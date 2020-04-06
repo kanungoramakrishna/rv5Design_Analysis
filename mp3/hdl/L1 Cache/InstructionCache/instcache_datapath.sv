@@ -39,6 +39,7 @@ logic dirty_in;
 logic LD_LRU;
 logic lru_in;
 
+logic [2:0] windex;
 
 
 //valid, dirty, LRU, and tag arrays for two ways//
@@ -58,7 +59,7 @@ array lru_arr (
     .read (1'b1),
     .load (LD_LRU),
     .rindex (mem_address[7:5]),
-    .windex (mem_address[7:5]),
+    .windex (windex),
     .datain (lru_in),
     .dataout (lru_data)
 );
@@ -78,7 +79,7 @@ data_array data_arr [1:0] (
     .read (1'b1),
     .write_en (data_arr_write_en),
     .rindex (mem_address[7:5]),
-    .windex (mem_address[7:5]),
+    .windex (windex),
     .datain (data_arr_in),
     .dataout (data_arr_out)
 );
@@ -165,6 +166,18 @@ begin
   begin
     LD_LRU<= LD_LRU_in;
     lru_in<= lru_in_value;
+  end
+end
+
+always_ff @(posedge clk)
+begin
+  if(rst)
+  begin
+    windex <= 0;
+  end
+  else
+  begin
+    windex <= mem_address[7:5];
   end
 end
 
