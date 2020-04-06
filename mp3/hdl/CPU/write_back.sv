@@ -81,6 +81,7 @@ begin
                 4'b0011: regfilemux_out = {{16{r_data_in[15]}},r_data_in[15:0]};
                 4'b0110: regfilemux_out = {{16{r_data_in[23]}},r_data_in[23:8]};
                 4'b1100: regfilemux_out = {{16{r_data_in[31]}},r_data_in[31:16]};
+                4'b1000: regfilemux_out = {{24{r_data_in[31]}},r_data_in[31:24]};
                 default: regfilemux_out = {{16{r_data_in[15]}},r_data_in[15:0]};
                 endcase
             end
@@ -90,6 +91,7 @@ begin
                 4'b0011: regfilemux_out = {{16{1'b0}},r_data_in[15:0]};
                 4'b0110: regfilemux_out = {{16{1'b0}},r_data_in[23:8]};
                 4'b1100: regfilemux_out = {{16{1'b0}},r_data_in[31:16]};
+                4'b1000: regfilemux_out = {{24{1'b0}},r_data_in[31:24]};
                 default: regfilemux_out = {{16{1'b0}},r_data_in[15:0]};
                 endcase
             end
