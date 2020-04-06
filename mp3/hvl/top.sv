@@ -60,7 +60,8 @@ mp3 dut(
 
 // Set this to the proper value
 assign itf.registers = dut.cpu.ID.regfile.data;
-assign rvfi.halt = dut.cpu.IF.pc_load & (dut.cpu.IF.pc_ff > dut.cpu.IF.pc_out);
+//assign rvfi.halt = dut.cpu.IF.pc_load & (dut.cpu.IF.pc_ff > dut.cpu.IF.pc_out);
+assign rvfi.halt = (dut.cpu.ID.regfile.data[1] == 32'h600D600D) | (dut.cpu.ID.regfile.data[1] == 32'h0000000F);
 /***************************** End Instantiation *****************************/
 
 endmodule
