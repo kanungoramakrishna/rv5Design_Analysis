@@ -105,7 +105,7 @@ begin
         rs1_out <= 32'b0;
         rs2_out <= 32'b0;
       end
-    else if (!(IF_stall || MA_stall))
+    else if (!MA_stall)
       begin
         PC_out <= PC;
         instruction_out <= data_;

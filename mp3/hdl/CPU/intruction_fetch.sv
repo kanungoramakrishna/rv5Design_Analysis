@@ -46,7 +46,7 @@ always_ff @(posedge clk) begin
 	if (rst) begin
 		pc_ff <= 32'b0;
 	end 
-	else if (!(IF_stall || MA_stall)) begin
+	else if (!(MA_stall)) begin
 		pc_ff <= pc_out;
 	end
 
@@ -54,7 +54,9 @@ always_ff @(posedge clk) begin
 	if (rst) begin
 		instr_ff <= 32'b0;
 	end 
-	else if (!(IF_stall || MA_stall)) begin
+	else if (IF_stall &&  (!(MA_stall)))
+		instr_ff <= 32'h00000013;
+	else if (!(MA_stall)) begin
 		instr_ff <= inst_rdata;
 	end
 end

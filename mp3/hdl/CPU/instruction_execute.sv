@@ -97,7 +97,7 @@ always_ff @(posedge clk) begin
     br_en_out <= 0;
     mem_byte_enable_out <= 0;
   end
-  else if (!(IF_stall || MA_stall)) begin
+  else if (!MA_stall) begin
     ctrl_word_out <= ctrl_word_in;
     instruction_out <= instruction_in;
     PC_out <= PC_in;
