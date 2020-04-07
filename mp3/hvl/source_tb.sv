@@ -7,7 +7,7 @@
 
 // Set these to 1 to enable the feature
 `define USE_SHADOW_MEMORY 1
-`define USE_RVFI_MONITOR 1
+`define USE_RVFI_MONITOR 0
 
 module source_tb(
     tb_itf.magic_mem magic_mem_itf,
@@ -51,7 +51,7 @@ generate
         magic_memory_dp mem(magic_mem_itf);
     end
     else if (`MEMORY == `PARAM_MEM) begin : memory
-        ParamMemory #(20, 10, 4, 256, 512) mem(mem_itf);
+        ParamMemory #(50, 25, 4, 256, 512) mem(mem_itf);
     end
 endgenerate
 
