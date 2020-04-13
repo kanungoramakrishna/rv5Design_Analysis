@@ -64,6 +64,10 @@ logic [3:0] mask_EXE_MA;
 logic br_EXE_MA;
 rv32i_word rs2_EXE_MA;
 
+pcmux_sel_t pcmux_sel;
+rv32i_word alu_out_to_PC;
+logic br_taken;
+
 
 //Signals between memory access and write back
 //connected to registered outputs registered outputs of memory access
@@ -83,10 +87,6 @@ logic load_regfile;
 logic [31:0] rd_in;
 logic [4:0] rd;
 
-//WB to IF for PC
-pcmux_sel_t pcmux_sel;
-rv32i_word alu_WB_IF;
-
 //stall, these are .*
 logic IF_stall;
 logic MA_stall;
@@ -97,7 +97,8 @@ instruction_fetch IF(
 	.clk        (clk ),
     .rst        (rst ),
     .pcmux_sel  (pcmux_sel ),
-    .alu_out    (alu_WB_IF ),
+    .alu_out    (alu_out_to_PC),
+    .br_taken       (br_taken),
 
     .inst_resp  (inst_resp),
     .inst_rdata (inst_rdata ),
@@ -119,6 +120,7 @@ instruction_decode ID(
     .rd_in  (rd_in ),
     .rd     (rd  ),
     .load_regfile   (load_regfile  ),
+    .br_taken       (br_taken),
 
     //Registered outputs
     .ctrl_out       (ctrl_ID_EXE),
@@ -153,7 +155,10 @@ instruction_execute EXE(
     .alu_out               (alu_EXE_MA),
     .rs2_out               (rs2_EXE_MA),
     .br_en_out             (br_EXE_MA ),
-    .mem_byte_enable_out   (mask_EXE_MA)
+    .mem_byte_enable_out   (mask_EXE_MA),
+    .alu_out_to_PC         (alu_out_to_PC),
+    .pcmux_sel             (pcmux_sel),
+    .br_taken       (br_taken)
 );
 
 memory_access MA(
@@ -201,9 +206,7 @@ write_back WB(
 
     .load_regfile           (load_regfile),
     .rd_in                  (rd_in),
-    .rd                     (rd),
-    .alu_out_to_PC          (alu_WB_IF),
-    .pcmux_sel              (pcmux_sel)
+    .rd                     (rd)
 );
 
 

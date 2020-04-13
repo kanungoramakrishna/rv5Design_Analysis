@@ -16,11 +16,7 @@ module write_back
     //To regfile (ID)
     output logic load_regfile,
     output logic [31:0] rd_in,
-    output logic [4:0] rd,
-
-    //To PCmux (IF)
-    output logic [31:0] alu_out_to_PC,
-    output  pcmux_sel_t pcmux_sel
+    output logic [4:0] rd
 );
 
 logic [31:0] regfilemux_out;
@@ -33,18 +29,6 @@ assign alu_out_to_PC = alu_in;
 assign load_regfile = ctrl_word_in.load_regfile;
 assign rd_in = regfilemux_out;
 assign rd = ctrl_word_in.rd;
-
-//PCMUX_sel
-always_comb
-begin
-    if(br_en_in[0] || ctrl_word_in.opcode == op_jal || ctrl_word_in.opcode == op_jalr) begin
-        pcmux_sel = ctrl_word_in.pcmux_sel;
-    end
-    else
-      pcmux_sel = pcmux::pc_plus4;
-
-end
-
 
 //Regfile MUX
 always_comb

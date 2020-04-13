@@ -4,11 +4,13 @@ module alu
 (
     input alu_ops aluop,
     input rv32i_word a, b,
-    output rv32i_word f
+    output rv32i_word f,
+    output rv32i_word alu_out_to_PC
 );
 
 always_comb
 begin
+    alu_out_to_PC = a + b;
     unique case (aluop)
         alu_add:  f = a + b;
         alu_sll:  f = a << b[4:0];

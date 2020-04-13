@@ -1,4 +1,5 @@
 import rv32i_types::*;
+import pcmux::*;
 
 module instruction_execute
 (
@@ -19,9 +20,12 @@ module instruction_execute
   output rv32i_word instruction_out,
   output rv32i_word PC_out,
   output rv32i_word alu_out,
+  output rv32i_word alu_out_to_PC,
+  output pcmux_sel_t pcmux_sel,
   output rv32i_word rs2_out,
   output logic br_en_out,
-  output logic [3:0] mem_byte_enable_out
+  output logic [3:0] mem_byte_enable_out,
+  output logic br_taken
 );
 
 rv32i_word alu_o;
@@ -32,7 +36,8 @@ alu alu (
   .aluop (ctrl_word_in.aluop),
   .a (alu_in_1),
   .b (alu_in_2),
-  .f (alu_o)
+  .f (alu_o),
+  .alu_out_to_PC (alu_out_to_PC)
 );
 
 cmp cmp (
@@ -40,11 +45,26 @@ cmp cmp (
   .cmpop (ctrl_word_in.cmpop)
 );
 
+
+
 always_comb begin
   //set byte enable
   //note that rs2 (write data) must be masked using byte enable,
   //done in mem_access stage to reduce logic in this stage
   //note that sw has same encoding as lw, etc. so we can account for both cases
+
+  //PCMUX_sel
+
+  if(br_en || ctrl_word_in.opcode == op_jal || ctrl_word_in.opcode == op_jalr) begin
+    pcmux_sel = ctrl_word_in.pcmux_sel;
+    br_taken = 1'b1;
+  end
+  else begin
+    br_taken = 1'b0;
+    pcmux_sel = pcmux::pc_plus4;
+  end
+
+
   unique case (load_funct3_t'(instruction_in[14:12]))
     default:
       mem_byte_enable = 4'b1111;
