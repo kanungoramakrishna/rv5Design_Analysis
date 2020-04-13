@@ -4,13 +4,12 @@
 .globl _start
 _start:
     beq x0, x0, ldr_str_test
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
+    addi x1, x0, 0xF
+    addi x1, x0, 0xF
+    addi x1, x0, 0xF
+    addi x1, x0, 0xF
+    addi x1, x0, 0xF
+    addi x1, x0, 0xF
     # cache line boundary
 
 ldr_str_test:
@@ -37,9 +36,9 @@ ldr_str_test:
    lw x3, %lo(Y)(x8)
    lw x4, %lo(Z)(x8)
    beq x0, x0, fetch_stall_test
-   nop
-   nop
-   nop
+   addi x1, x0, 0xF
+   addi x1, x0, 0xF
+   addi x1, x0, 0xF
    # cache line boundary
    nop
    nop
@@ -79,6 +78,8 @@ inf:
    nop
    nop
    # cache line boundary
+
+.equ BAD, 0x0000000F
 
 .section .rodata
 .balign 256
