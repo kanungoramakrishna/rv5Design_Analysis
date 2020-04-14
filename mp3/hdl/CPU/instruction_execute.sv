@@ -42,6 +42,7 @@ alu alu (
 
 cmp cmp (
   .*,
+  .opcode (ctrl_word_in.opcode),
   .cmpop (ctrl_word_in.cmpop)
 );
 
