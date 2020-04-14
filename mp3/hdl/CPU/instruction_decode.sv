@@ -13,7 +13,8 @@ module instruction_decode
     //These inputs come from the WB stage
     input  rv32i_word  rd_in,
     input  logic [4:0] rd,
-    input  logic       load_regfile,
+    input  logic load_regfile,
+    input logic br_taken,
 
     output rv32i_control_word ctrl_out,
     output rv32i_word instruction_out,
@@ -97,7 +98,7 @@ begin
     if(rst)
       begin
         PC_out <= 32'b0;
-        instruction_out <= 32'b0;
+        instruction_out <= 32'h00000000;
         ctrl_out <= 0;
         ALUin_1_out <= 32'b0;
         ALUin_2_out <= 32'b0;
@@ -105,6 +106,17 @@ begin
         rs1_out <= 32'b0;
         rs2_out <= 32'b0;
       end
+    //branch recovery
+    else if (br_taken) begin
+      PC_out <= 32'b0;
+      instruction_out <= 32'h00000013;
+      ctrl_out <= 0;
+      ALUin_1_out <= 32'b0;
+      ALUin_2_out <= 32'b0;
+      CMPin_out <= 32'b0;
+      rs1_out <= 32'b0;
+      rs2_out <= 32'b0;
+    end
     else if (!MA_stall)
       begin
         PC_out <= PC;

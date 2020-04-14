@@ -8,6 +8,7 @@ module instruction_fetch
 	input logic MA_stall,
 	input  pcmux_sel_t pcmux_sel, 	// From WB
 	input  rv32i_word alu_out,		// From WB
+	input logic br_taken,
 	output rv32i_word pc_ff,
 	output rv32i_word instr_ff,
 
@@ -45,7 +46,7 @@ always_ff @(posedge clk) begin
 	// PC
 	if (rst) begin
 		pc_ff <= 32'b0;
-	end 
+	end
 	else if (!(MA_stall)) begin
 		pc_ff <= pc_out;
 	end
@@ -53,15 +54,15 @@ always_ff @(posedge clk) begin
 	// Instruction Data
 	if (rst) begin
 		instr_ff <= 32'b0;
-	end 
-	else if (IF_stall &&  (!(MA_stall)))
+	end
+	else if ((IF_stall &&  (!(MA_stall))) || br_taken)
 		instr_ff <= 32'h00000013;
 	else if (!(MA_stall)) begin
 		instr_ff <= inst_rdata;
 	end
 end
 
-always_comb begin	
+always_comb begin
 	if (inst_resp)
 	begin
 		IF_stall = 1'b0;
