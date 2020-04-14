@@ -40,7 +40,7 @@ ldr_str_test:
    nop
    nop
    nop
-   # cache line boundary
+   # cache line boundary e0
    nop
    nop
    nop
@@ -49,7 +49,7 @@ ldr_str_test:
    nop
    nop
    nop
-   # cache line boundary
+   # cache line boundary 100
    nop
    nop
    nop
@@ -57,9 +57,9 @@ ldr_str_test:
    nop
    nop
    nop
-fetch_stall_test:
+fetch_stall_test:        
    add x5, x1, x2
-   # cache line boundary
+   # cache line boundary   120
    add x6, x3, x4
    nop
    nop
@@ -68,7 +68,7 @@ fetch_stall_test:
    sw x5, %lo(VICTIM)(x8)
    add x7, x5, x6
    nop
-   # cache line boundary
+   # cache line boundary   140
    nop
    nop
    nop
@@ -78,7 +78,7 @@ inf:
    beq x0, x0, inf
    nop
    nop
-   # cache line boundary
+   # cache line boundary   160
 
 .section .rodata
 .balign 256
@@ -91,7 +91,7 @@ DataSeg:
 	nop
 W:    	.word 0x00000009
 X:    	.word 0x00000002
-   # cache line boundary
+   # cache line boundary  220
 
 Y: 	.word 0x00000001
 Z:  	.word 0x00000003
@@ -101,7 +101,7 @@ Z:  	.word 0x00000003
 	nop
 	nop
 	nop
-   # cache line boundary
+   # cache line boundary  240
 
 TOTAL: 	.word 0x00000000
 	nop
@@ -111,7 +111,7 @@ TOTAL: 	.word 0x00000000
 	nop
 	nop
 	nop
-   # cache line boundary
+   # cache line boundary   260
 
 VICTIM:	.word 0x00000000
 	nop
