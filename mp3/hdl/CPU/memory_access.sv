@@ -31,6 +31,11 @@ output logic [31:0] alu_output_out,
 output logic MA_stall
 );
 
+module mem_forward_unit MFU
+(
+  // TODO
+);
+
 assign data_addr = {alu_output_in[31:2], 2'b00};
 assign data_mbe = mem_byte_enable_in;
 assign data_wdata = rs2_out;

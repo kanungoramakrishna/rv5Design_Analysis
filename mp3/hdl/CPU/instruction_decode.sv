@@ -62,6 +62,10 @@ regfile regfile(
     .reg_b (reg_b )
 );
 
+hazard_unit hazU (
+    // TODO
+);
+
 //CW module
 control_rom control_rom(.*, .data(data_));
 

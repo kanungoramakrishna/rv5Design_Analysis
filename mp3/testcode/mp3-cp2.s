@@ -1,15 +1,17 @@
+<<<<<<< HEAD
 #  mp3-cp2.s version 1.0
 .align 4
 .section .text
 .globl _start
 _start:
     beq x0, x0, ldr_str_test
-    addi x1, x0, 0xF
-    addi x1, x0, 0xF
-    addi x1, x0, 0xF
-    addi x1, x0, 0xF
-    addi x1, x0, 0xF
-    addi x1, x0, 0xF
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
     # cache line boundary
 
 ldr_str_test:
@@ -36,10 +38,10 @@ ldr_str_test:
    lw x3, %lo(Y)(x8)
    lw x4, %lo(Z)(x8)
    beq x0, x0, fetch_stall_test
-   addi x1, x0, 0xF
-   addi x1, x0, 0xF
-   addi x1, x0, 0xF
-   # cache line boundary
+   nop
+   nop
+   nop
+   # cache line boundary e0
    nop
    nop
    nop
@@ -48,7 +50,7 @@ ldr_str_test:
    nop
    nop
    nop
-   # cache line boundary
+   # cache line boundary 100
    nop
    nop
    nop
@@ -56,9 +58,9 @@ ldr_str_test:
    nop
    nop
    nop
-fetch_stall_test:
+fetch_stall_test:        
    add x5, x1, x2
-   # cache line boundary
+   # cache line boundary   120
    add x6, x3, x4
    nop
    nop
@@ -67,7 +69,7 @@ fetch_stall_test:
    sw x5, %lo(VICTIM)(x8)
    add x7, x5, x6
    nop
-   # cache line boundary
+   # cache line boundary   140
    nop
    nop
    nop
@@ -77,9 +79,7 @@ inf:
    beq x0, x0, inf
    nop
    nop
-   # cache line boundary
-
-.equ BAD, 0x0000000F
+   # cache line boundary   160
 
 .section .rodata
 .balign 256
@@ -92,7 +92,7 @@ DataSeg:
 	nop
 W:    	.word 0x00000009
 X:    	.word 0x00000002
-   # cache line boundary
+   # cache line boundary  220
 
 Y: 	.word 0x00000001
 Z:  	.word 0x00000003
@@ -102,7 +102,7 @@ Z:  	.word 0x00000003
 	nop
 	nop
 	nop
-   # cache line boundary
+   # cache line boundary  240
 
 TOTAL: 	.word 0x00000000
 	nop
@@ -112,7 +112,7 @@ TOTAL: 	.word 0x00000000
 	nop
 	nop
 	nop
-   # cache line boundary
+   # cache line boundary   260
 
 VICTIM:	.word 0x00000000
 	nop
