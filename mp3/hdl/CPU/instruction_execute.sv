@@ -69,7 +69,9 @@ always_comb begin
     pcmux_sel = pcmux::pc_plus4;
   end
 
+mem_byte_enable = 0;
 
+if (ctrl_word_in.opcode == op_store || ctrl_word_in.opcode == op_load) begin
   unique case (load_funct3_t'(instruction_in[14:12]))
     default:
       mem_byte_enable = 4'b1111;
@@ -110,6 +112,7 @@ always_comb begin
       endcase
     end
   endcase
+end
 end
 
 always_ff @(posedge clk) begin
