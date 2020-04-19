@@ -31,10 +31,15 @@ output logic [31:0] alu_output_out,
 output logic MA_stall
 );
 
-module mem_forward_unit MFU
-(
-  // TODO
-);
+// logic fwd; // TODO connect this
+// mem_forward_unit MFU
+// (
+//   .ex_mem         (ctrl_word_in),
+//   .ex_mem_address ({alu_output_in[31:2], 2'b00}),
+//   .mem_wb         (ctrl_word_out),
+//   .mem_wb_address ({alu_output_out[31:2], 2'b00}),
+//   .fwd            (fwd)
+// );
 
 assign data_addr = {alu_output_in[31:2], 2'b00};
 assign data_mbe = mem_byte_enable_in;
