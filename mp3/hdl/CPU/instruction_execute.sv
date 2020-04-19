@@ -46,6 +46,10 @@ cmp cmp (
   .cmpop (ctrl_word_in.cmpop)
 );
 
+ex_forward_unit EFU (
+  // TODO
+);
+
 
 
 always_comb begin
