@@ -65,17 +65,6 @@ always_comb begin
 
   // Forwarding Muxes
   unique case (fwd_alu[0])
-<<<<<<< HEAD
-    default: alu_input_1 = alu_in_1;
-    2'b01:   alu_input_1 = alu_out;     // Data from EX/MEM
-    2'b10:   alu_input_1 = mem_wb_data; // Data from MEM/WB
-  endcase
-
-  unique case (fwd_alu[1]) 
-    default: alu_input_2 = alu_in_2;
-    2'b01:   alu_input_2 = alu_out;     // Data from EX/MEM
-    2'b10:   alu_input_2 = mem_wb_data; // Data from MEM/WB
-=======
     default: begin
       alu_input_1 = alu_in_1;
       cmp_input_1 = rs1_out;
@@ -89,7 +78,6 @@ always_comb begin
       cmp_input_1 = alu_out;
     end
 
->>>>>>> 3312b58991c600e85bf281f3825d3f681e149531
   endcase
 
   unique case (fwd_alu[1])
