@@ -14,7 +14,7 @@ module mp3
 
 );
 
-//CPU Signals
+/******************CPU <-> L1Caches******************/
 logic inst_read;
 logic [31:0] inst_addr;
 logic inst_resp;
@@ -28,13 +28,11 @@ logic [31:0] data_wdata;
 logic data_resp;
 logic [31:0] data_rdata;
 
-//Arbiter Signals
+
+/******************L1Caches <-> Arbiter******************/
 logic inst_r;
 logic data_w;
 logic data_r;
-
-logic [255:0] line_o;
-logic [255:0] line_i;
 
 logic [255:0] data_line_i;
 logic [255:0] data_line_o;
@@ -42,64 +40,29 @@ logic [255:0] inst_line_o;
 
 logic data_resp_arbiter;
 logic inst_resp_arbiter;
-
-logic [26:0] tag;
-
-logic read;
-logic write;
-logic mem_resp;
-
-//address bits
 logic [31:0] data_address;
 logic [31:0] inst_address;
 
-logic [31:0] address;
+/******************Arbiter <-> L2Cache******************/
+logic [26:0] address_arbiter_to_l2;
+logic read_arbiter_to_l2;
+logic write_arbiter_to_l2;
+logic mem_resp;
+logic [255:0] data_L2_to_arbiter;
+logic [255:0] data_arbiter_to_l2;
 
-
-assign address = {tag,5'b0};
-
-
-arbiter arbiter(
-	.clk               (clk               ),
-    .rst               (rst               ),
-    .mem_resp          (  mem_resp        ),
-    .line_o            (line_o        ),
-    .inst_tag          (inst_address[31:5]          ),
-    .inst_r            (inst_r            ),
-    .data_tag          (data_address[31:5]          ),
-    .data_w            (data_w            ),
-    .data_r            (data_r            ),
-    .data_line_i       (data_line_i       ),
-    .data_line_o       (data_line_o       ),
-    .inst_line_o       (inst_line_o       ),
-    .data_resp_arbiter (data_resp_arbiter ),
-    .inst_resp_arbiter (inst_resp_arbiter ),
-    .line_i            (line_i       ),
-    .read              (read              ),
-    .write             (write         ),
-    .tag               (tag               )
-);
-
-cacheline_adaptor cacheline_adaptor(
-	.clk       (clk       ),
-    .reset_n   (rst   ),
-    .line_i    ( line_i   ),
-    .line_o    (  line_o  ),
-    .address_i (address ),
-    .read_i    (read    ),
-    .write_i   (write   ),
-    .resp_o    (  mem_resp  ),
-    .burst_i   (pmem_rdata   ),
-    .burst_o   (pmem_wdata   ),
-    .address_o (pmem_address ),
-    .read_o    (pmem_read    ),
-    .write_o   (pmem_write   ),
-    .resp_i    (pmem_resp    )
-);
+/******************L2Cache <-> CachelineAdaptor******************/
+logic [255:0] data_cacheline_to_L2;
+logic [255:0] data_L2_to_cacheline;
+logic [31:0]  address_L2_to_cacheline;
+logic read_L2_to_cacheline;
+logic write_L2_to_cacheline;
+logic resp_cacheline_to_L2;
 
 
 
 cpu cpu(.*);
+
 
 
 datacache datacache(
@@ -120,6 +83,7 @@ datacache datacache(
     .mem_resp           (data_resp)
 );
 
+
 instcache instcache(
 	.clk            (clk),
     .rst            (rst),
@@ -132,6 +96,70 @@ instcache instcache(
     .pmem_read      (inst_r),
     .mem_resp       (inst_resp)
 );
+
+
+
+arbiter arbiter(
+	.clk               (clk               ),
+    .rst               (rst               ),
+    .mem_resp          (mem_resp),
+    .data_L2_to_arbiter(data_L2_to_arbiter),
+    .inst_tag          (inst_address[31:5]          ),
+    .inst_r            (inst_r            ),
+    .data_tag          (data_address[31:5]          ),
+    .data_w            (data_w            ),
+    .data_r            (data_r            ),
+    .data_line_i       (data_line_i       ),
+    .data_line_o       (data_line_o       ),
+    .inst_line_o       (inst_line_o       ),
+    .data_resp_arbiter (data_resp_arbiter ),
+    .inst_resp_arbiter (inst_resp_arbiter ),
+    .data_arbiter_to_l2(data_arbiter_to_l2),
+    .read_arbiter_to_l2(read_arbiter_to_l2),
+    .write_arbiter_to_l2(write_arbiter_to_l2),
+    .address_arbiter_to_l2(address_arbiter_to_l2)
+);
+
+
+L2Cache L2Cache(
+	.clk                    (clk                    ),
+    .rst                    (rst                    ),
+    .mem_address            ({address_arbiter_to_l2,5'b0}),
+    .mem_wdata              (data_arbiter_to_l2 ),
+    .mem_write              (write_arbiter_to_l2 ),
+    .mem_read               (read_arbiter_to_l2  ),
+    .pmem_resp              (resp_cacheline_to_L2  ),
+    .pmem_rdata             (data_cacheline_to_L2 ),
+    .mem_rdata              (data_L2_to_arbiter ),
+    .pmem_wdata             ( data_L2_to_cacheline),
+    .pmem_address           (address_L2_to_cacheline),
+    .pmem_write             (write_L2_to_cacheline ),
+    .pmem_read              (read_L2_to_cacheline),
+    .mem_resp               (mem_resp)
+);
+
+
+
+cacheline_adaptor cacheline_adaptor(
+	.clk       (clk       ),
+    .reset_n   (rst   ),
+
+    .line_i    (data_L2_to_cacheline),
+    .line_o    (data_cacheline_to_L2),
+    .address_i (address_L2_to_cacheline),
+    .read_i    (read_L2_to_cacheline),
+    .write_i   (write_L2_to_cacheline),
+    .resp_o    (resp_cacheline_to_L2),
+
+    .burst_i   (pmem_rdata   ),
+    .burst_o   (pmem_wdata   ),
+    .address_o (pmem_address ),
+    .read_o    (pmem_read    ),
+    .write_o   (pmem_write   ),
+    .resp_i    (pmem_resp    )
+);
+
+
 
 
 

@@ -20,7 +20,7 @@ module cacheline_adaptor
     input resp_i
 );
 
-logic LD_data0, LD_data1, LD_data2, LD_data3, LD_read, LD_write, LD_address, LD_line, read_active, write_active;
+logic LD_data0, LD_data1, LD_data2, LD_data3, LD_data4, LD_data5, LD_data6, LD_data7, LD_read, LD_write, LD_address, LD_line, read_active, write_active;
 
 logic [255:0] line_data;
 
@@ -29,6 +29,7 @@ reg_block #(64) block0(.*, .LD_data(LD_data0), .reset(reset_n), .data_in(burst_i
 reg_block #(64) block1(.*, .LD_data(LD_data1), .reset(reset_n), .data_in(burst_i), .data_out(line_o[127:64]));
 reg_block #(64) block2(.*, .LD_data(LD_data2), .reset(reset_n), .data_in(burst_i), .data_out(line_o[191:128]));
 reg_block #(64) block3(.*, .LD_data(LD_data3), .reset(reset_n), .data_in(burst_i), .data_out(line_o[255:192]));
+
 
 reg_block #(1) read_ff(.*, .LD_data(LD_read), .reset(reset_n), .data_in(read_i), .data_out(read_active));
 reg_block #(1) write_ff(.*, .LD_data(LD_write), .reset(reset_n), .data_in(write_i), .data_out(write_active));
@@ -39,7 +40,7 @@ reg_block #(256) line_ff(.*, .LD_data(LD_line), .reset(reset_n), .data_in(line_i
 
 
 //states for state machine
-enum logic [2:0] {HALT, BURST0, BURST1, BURST2, BURST3, DONE} curr_state, next_state;
+enum logic [3:0] {HALT, BURST0, BURST1, BURST2, BURST3, DONE} curr_state, next_state;
 
 always_ff @(posedge clk) begin
   if (reset_n)
@@ -90,6 +91,10 @@ always_comb begin
   LD_data1 = 0;
   LD_data2 = 0;
   LD_data3 = 0;
+  LD_data4 = 0;
+  LD_data5 = 0;
+  LD_data6 = 0;
+  LD_data7 = 0;
   LD_read = 1'b0;
   LD_write = 1'b0;
   LD_address = 1'b0;
@@ -156,7 +161,6 @@ always_comb begin
 
       end
     end
-
     DONE: begin
       resp_o = 1'b1;
     end
