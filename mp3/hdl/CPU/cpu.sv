@@ -70,7 +70,7 @@ rv32i_word alu_out_to_PC;
 logic br_taken;
 
 rv32i_control_word mem_wb;      // Forwarding
-rv32i_word         mem_wb_data; 
+rv32i_word mem_wb_data; 
 
 
 //Signals between memory access and write back

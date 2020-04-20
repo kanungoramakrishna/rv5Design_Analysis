@@ -66,13 +66,13 @@ always_comb begin
   unique case (fwd_alu[0])
     default: alu_input_1 = alu_in_1;
     2'b01:   alu_input_1 = alu_out;     // Data from EX/MEM
-    2'b10:   alu_input_1 = mem_wb_data; // Data from ID/EX
+    2'b10:   alu_input_1 = mem_wb_data; // Data from MEM/WB
   endcase
 
   unique case (fwd_alu[1]) 
     default: alu_input_2 = alu_in_2;
     2'b01:   alu_input_2 = alu_out;     // Data from EX/MEM
-    2'b10:   alu_input_2 = mem_wb_data; // Data from ID/EX
+    2'b10:   alu_input_2 = mem_wb_data; // Data from MEM/WB
   endcase
 
   //set byte enable
