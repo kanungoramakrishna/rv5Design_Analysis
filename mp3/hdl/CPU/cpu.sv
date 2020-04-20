@@ -42,7 +42,7 @@ logic [1:0] mask_out;
 //connected to registered outputs of fetch
 rv32i_word instruction_IF_DE;
 rv32i_word PC_IF_DE;
-logic bubble;   // Forwardin 
+logic bubble;   // Forwarding 
 
 //Signals between decode and execute
 //connected to registered outputs of decode
@@ -68,9 +68,6 @@ rv32i_word rs2_EXE_MA;
 pcmux_sel_t pcmux_sel;
 rv32i_word alu_out_to_PC;
 logic br_taken;
-
-rv32i_control_word mem_wb;      // Forwarding
-rv32i_word mem_wb_data; 
 
 
 //Signals between memory access and write back
@@ -102,7 +99,8 @@ instruction_fetch IF(
     .rst        (rst ),
     .pcmux_sel  (pcmux_sel ),
     .alu_out    (alu_out_to_PC),
-    .br_taken       (br_taken),
+    .br_taken   (br_taken),
+    .bubble     (bubble),    // Forwarding 
 
     .inst_resp  (inst_resp),
     .inst_rdata (inst_rdata ),
@@ -112,6 +110,7 @@ instruction_fetch IF(
     //Registered outputs
     .pc_ff      (PC_IF_DE ),
     .instr_ff   (instruction_IF_DE )
+
 );
 
 instruction_decode ID(
@@ -134,7 +133,9 @@ instruction_decode ID(
     .ALUin_2_out    (ALUin_2_ID_EXE),
     .CMPin_out      (CMPin_ID_EXE  ),
     .rs1_out        (rs1_ID_EXE    ),
-    .rs2_out        (rs2_ID_EXE    )
+    .rs2_out        (rs2_ID_EXE    ),
+
+    .bubble         (bubble)    // Forwarding
 );
 
 
@@ -151,8 +152,8 @@ instruction_execute EXE(
     .rs2                   (rs2_ID_EXE),
     .cmp_in                (CMPin_ID_EXE),
     .ctrl_word_in          (ctrl_ID_EXE  ),
-    .mem_wb                (mem_wb),
-    .mem_wb_data           (mem_wb_data),
+    .mem_wb                (ctrl_MA_WB),
+    .mem_wb_data           (rd_in),
 
     //Registered outputs
     .ctrl_word_out         (ctrl_EXE_MA ),
@@ -164,7 +165,7 @@ instruction_execute EXE(
     .mem_byte_enable_out   (mask_EXE_MA),
     .alu_out_to_PC         (alu_out_to_PC),
     .pcmux_sel             (pcmux_sel),
-    .br_taken       (br_taken)
+    .br_taken              (br_taken)
 );
 
 memory_access MA(
