@@ -7,8 +7,7 @@ module hazard_unit
 	output logic              bubble //when asserted, generate NOPS and stall ID/IF
 );
 
-rv32i_reg rs1;
-rv32i_reg rs2;
+rv32i_reg rs1,rs2; 
 rv32i_opcode instr_op;
 
 
@@ -16,7 +15,7 @@ always_comb
 begin
 	rs1 = 0;
 	rs2 = 0;
-	stall = 0;
+	bubble = 0;
 	instr_op = rv32i_opcode'(instr[6:0]);
 
 	case (id_ex.opcode)
@@ -45,11 +44,11 @@ begin
 		begin
 			/*We don't stall in this case because the 
 			memory forwarding unit will handle it*/
-			stall = 0;
+			bubble = 0;
 		end 
 		else if (id_ex.rd == rs1 || id_ex.rd == rs2)
 		begin
-			stall = 1;
+			bubble = 1;
 		end
 	end
 end

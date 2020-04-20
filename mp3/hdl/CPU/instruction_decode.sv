@@ -65,8 +65,8 @@ regfile regfile(
 );
 
 hazard_unit hazU (
-    .id_ex  (data_),
-    .ctrl   (ctrl_out),
+    .instr  (data_),
+    .id_ex   (ctrl_out),
     .bubble (bubble)
 );
 

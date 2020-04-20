@@ -152,7 +152,7 @@ instruction_execute EXE(
     .cmp_in                (CMPin_ID_EXE),
     .ctrl_word_in          (ctrl_ID_EXE  ),
     .mem_wb                (mem_wb),
-    .mem_wb_data           (mem_wb_data)
+    .mem_wb_data           (mem_wb_data),
 
     //Registered outputs
     .ctrl_word_out         (ctrl_EXE_MA ),
