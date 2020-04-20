@@ -35,6 +35,7 @@ logic [3:0] mem_byte_enable;
 logic br_en;
 logic [1:0] fwd_alu [1:0];
 rv32i_word alu_input_1, alu_input_2;
+rv32i_word cmp_input_1, cmp_input_2;
 
 alu alu (
   .aluop (ctrl_word_in.aluop),
@@ -55,7 +56,7 @@ ex_forward_unit EFU (
   .id_ex       (ctrl_word_in),
   .ex_mem      (ctrl_word_out),
   .mem_wb      (mem_wb),
-  .fwd_alu     (fwd_alu)  // array of logic [1:0]
+  .fwd_alu     (fwd_alu)
 );
 
 
@@ -64,6 +65,7 @@ always_comb begin
 
   // Forwarding Muxes
   unique case (fwd_alu[0])
+<<<<<<< HEAD
     default: alu_input_1 = alu_in_1;
     2'b01:   alu_input_1 = alu_out;     // Data from EX/MEM
     2'b10:   alu_input_1 = mem_wb_data; // Data from MEM/WB
@@ -73,12 +75,37 @@ always_comb begin
     default: alu_input_2 = alu_in_2;
     2'b01:   alu_input_2 = alu_out;     // Data from EX/MEM
     2'b10:   alu_input_2 = mem_wb_data; // Data from MEM/WB
+=======
+    default: begin
+      alu_input_1 = alu_in_1;
+      cmp_input_1 = rs1_out;
+    end
+    2'b01: begin
+      alu_input_1 = mem_wb_data;     // Data from MA/WB
+      cmp_input_1 = mem_wb_data;
+    end
+    2'b10: begin
+      alu_input_1 = alu_out; // Data from EX/MEM
+      cmp_input_1 = alu_out;
+    end
+
+>>>>>>> 3312b58991c600e85bf281f3825d3f681e149531
   endcase
 
-  //set byte enable
-  //note that rs2 (write data) must be masked using byte enable,
-  //done in mem_access stage to reduce logic in this stage
-  //note that sw has same encoding as lw, etc. so we can account for both cases
+  unique case (fwd_alu[1])
+    default: begin
+      alu_input_2 = alu_in_2;
+      cmp_input_2 = cmp_in;
+    end
+    2'b01: begin
+      alu_input_2 = mem_wb_data;     // Data from MA/WB
+      cmp_input_2 = mem_wb_data;
+    end
+    2'b10:  begin
+      alu_input_2 = alu_out; // Data from EX/MEM
+      cmp_input_2 = alu_out;
+    end
+  endcase
 
   //PCMUX_sel
 
