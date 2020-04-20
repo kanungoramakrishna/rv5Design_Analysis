@@ -23,7 +23,8 @@ module instruction_decode
     output rv32i_word ALUin_2_out,
     output rv32i_word CMPin_out,
     output rv32i_word rs1_out,
-    output rv32i_word rs2_out
+    output rv32i_word rs2_out,
+    output logic bubble
 );
 
 
@@ -49,6 +50,7 @@ rv32i_word CMPin;
 rv32i_word reg_a;
 rv32i_word reg_b;
 
+
 //Regfile
 regfile regfile(
 	.clk   (clk   ),
@@ -63,7 +65,9 @@ regfile regfile(
 );
 
 hazard_unit hazU (
-    // TODO
+    .instr  (data_),
+    .id_ex   (ctrl_out),
+    .bubble (bubble)
 );
 
 //CW module
@@ -111,7 +115,7 @@ begin
         rs2_out <= 32'b0;
       end
     //branch recovery
-    else if (br_taken) begin
+    else if (br_taken || bubble) begin
       PC_out <= 32'b0;
       instruction_out <= 32'h00000013;
       ctrl_out <= 0;

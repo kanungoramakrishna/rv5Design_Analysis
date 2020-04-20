@@ -5,26 +5,27 @@ module instruction_fetch
 	// Pileline IO
 	input  logic       clk,
 	input  logic       rst,
-	input logic MA_stall,
+	input  logic       MA_stall,
 	input  pcmux_sel_t pcmux_sel, 	// From WB
-	input  rv32i_word alu_out,		// From WB
-	input logic br_taken,
-	output rv32i_word pc_ff,
-	output rv32i_word instr_ff,
+	input  rv32i_word  alu_out,		// From WB
+	input  logic       br_taken,
+	input  logic       bubble,      // From ID
+	output rv32i_word  pc_ff,
+	output rv32i_word  instr_ff,
 
 	// Cache IO
-	input  logic       inst_resp,
+	input  logic      inst_resp,
 	input  rv32i_word inst_rdata,
-	output logic       inst_read,
+	output logic      inst_read,
 	output rv32i_word inst_addr,
-	output logic IF_stall
+	output logic      IF_stall
 );
 
 logic pc_load;
 rv32i_word pc_in;
 rv32i_word pc_out;
 
-assign pc_load = (!(IF_stall || MA_stall));			// Always increment (?)
+assign pc_load = (!(IF_stall || MA_stall || bubble));			// Always increment (?)
 assign inst_read = 1'b1;		// Always read (?)
 assign inst_addr = pc_out;
 
@@ -47,7 +48,7 @@ always_ff @(posedge clk) begin
 	if (rst) begin
 		pc_ff <= 32'b0;
 	end
-	else if (!(MA_stall)) begin
+	else if (!(MA_stall || bubble)) begin
 		pc_ff <= pc_out;
 	end
 
@@ -57,7 +58,7 @@ always_ff @(posedge clk) begin
 	end
 	else if ((IF_stall &&  (!(MA_stall))) || br_taken)
 		instr_ff <= 32'h00000013;
-	else if (!(MA_stall)) begin
+	else if (!(MA_stall || bubble)) begin
 		instr_ff <= inst_rdata;
 	end
 end

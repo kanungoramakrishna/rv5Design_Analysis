@@ -2,7 +2,7 @@ module arbiter (
     input clk,
     input rst,
     input logic mem_resp, //l2-resp for CP3 onwards
-    input logic [255:0] line_o,
+    input logic [255:0] data_L2_to_arbiter,
 
     input logic [26:0] inst_tag,
     input logic inst_r,
@@ -17,10 +17,10 @@ module arbiter (
     output logic data_resp_arbiter,
     output logic inst_resp_arbiter,
 
-    output logic [255:0] line_i, //line to L2 cache (shadow memory for now)
-    output logic read,
-    output logic write,
-    output logic [26:0] tag
+    output logic [255:0] data_arbiter_to_l2, //line to L2 cache (shadow memory for now)
+    output logic read_arbiter_to_l2,
+    output logic write_arbiter_to_l2,
+    output logic [26:0] address_arbiter_to_l2
 );
 
 //copies of output to L2 cache
@@ -36,8 +36,8 @@ logic l2_type_in;
 logic inst_resp_arbiter_in;
 logic data_resp_arbiter_in;
 
-assign data_line_o = line_o;
-assign inst_line_o = line_o;
+assign data_line_o = data_L2_to_arbiter;
+assign inst_line_o = data_L2_to_arbiter;
 
 enum logic {
  IDLE, ACTIVE
@@ -115,19 +115,19 @@ end
 //assign registered L2 outputs
 always_ff @(negedge clk) begin
   if (rst) begin
-    line_i <= 0;
-    tag <= 0;
-    read <= 0;
-    write <= 0;
+    data_arbiter_to_l2 <= 0;
+    address_arbiter_to_l2 <= 0;
+    read_arbiter_to_l2 <= 0;
+    write_arbiter_to_l2 <= 0;
     l2_type <= 0;
     inst_resp_arbiter <= 0;
     data_resp_arbiter <=0;
   end
   else begin
-    line_i <= l2_line_i;
-    tag <= l2_tag;
-    read <= l2_read;
-    write <= l2_write;
+    data_arbiter_to_l2 <= l2_line_i;
+    address_arbiter_to_l2 <= l2_tag;
+    read_arbiter_to_l2 <= l2_read;
+    write_arbiter_to_l2 <= l2_write;
     l2_type <= l2_type_in;
     inst_resp_arbiter <= inst_resp_arbiter_in;
     data_resp_arbiter <= data_resp_arbiter_in;

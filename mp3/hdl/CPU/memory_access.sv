@@ -31,14 +31,21 @@ output logic [31:0] alu_output_out,
 output logic MA_stall
 );
 
-module mem_forward_unit MFU
+logic fwd;
+mem_forward_unit MFU
 (
-  // TODO
+  .ex_mem         (ctrl_word_in),
+  .ex_mem_address ({alu_output_in[31:2], 2'b00}),
+  .ex_mem_instr   (instruction_in),
+  .mem_wb         (ctrl_word_out),
+  .mem_wb_address ({alu_output_out[31:2], 2'b00}),
+  .mem_wb_instr   (instruction_out),
+  .fwd            (fwd)
 );
 
 assign data_addr = {alu_output_in[31:2], 2'b00};
 assign data_mbe = mem_byte_enable_in;
-assign data_wdata = rs2_out;
+assign data_wdata = (fwd) ? r_data_out : rs2_out;
 assign data_read = ctrl_word_in.read;
 assign data_write = ctrl_word_in.write;
 
@@ -71,7 +78,7 @@ always_ff @(posedge clk) begin
     instruction_out <= instruction_in;
     mem_byte_enable_out <= mem_byte_enable_in;
     //rdata holds its value until resp goes high from memory, but for now we will always get once cycle hit
-    r_data_out <= data_rdata_in;
+    r_data_out <= (fwd) ? r_data_out : data_rdata_in;
     br_en_out <= {31'b0,br_en_in}; 
     PC_plus4_out <= PC_in +4;
     PC_out <= PC_in;
