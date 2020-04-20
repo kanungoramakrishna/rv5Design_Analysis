@@ -2,9 +2,9 @@ import rv32i_types::*;
 
 module hazard_unit
 (
-	input  rv32i_word instr, 
-	input  rv32i_control_word ctrl,
-	output logic stall //when asserted, generate NOPS and stall ID/IF
+	input  rv32i_word         instr, 
+	input  rv32i_control_word id_ex,
+	output logic              bubble //when asserted, generate NOPS and stall ID/IF
 );
 
 rv32i_reg rs1;
@@ -19,7 +19,7 @@ begin
 	stall = 0;
 	instr_op = rv32i_opcode'(instr[6:0]);
 
-	case (ctrl.opcode)
+	case (id_ex.opcode)
 		op_lui,op_auipc,op_jal,op_jal:
 		begin
 			rs1 = 0;
@@ -39,15 +39,15 @@ begin
 		end
 	endcase
 
-	if (ctrl.opcode == op_load && ctrl.rd != 0)
+	if (id_ex.opcode == op_load && id_ex.rd != 0)
 	begin
-		if (instr_op == op_store && ctrl.rd == rs2)
+		if (instr_op == op_store && id_ex.rd == rs2)
 		begin
 			/*We don't stall in this case because the 
 			memory forwarding unit will handle it*/
 			stall = 0;
 		end 
-		else if (ctrl.rd == rs1 || ctrl.rd == rs2)
+		else if (id_ex.rd == rs1 || id_ex.rd == rs2)
 		begin
 			stall = 1;
 		end
