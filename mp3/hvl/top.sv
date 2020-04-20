@@ -19,7 +19,7 @@ source_tb tb(
 /************************ Signals necessary for monitor **********************/
 // This section not required until CP3
 
-assign rvfi.commit = 0; // Set high when a valid instruction is modifying regfile or PC
+assign rvfi.commit = dut.cpu.IF.pc_load; // Set high when a valid instruction is modifying regfile or PC
 //assign rvfi.halt = 0;   // Set high when you detect an infinite loop
 initial rvfi.order = 0;
 always @(posedge itf.clk iff rvfi.commit) rvfi.order <= rvfi.order + 1; // Modify for OoO
@@ -60,8 +60,10 @@ mp3 dut(
 
 // Set this to the proper value
 assign itf.registers = dut.cpu.ID.regfile.data;
-//assign rvfi.halt = dut.cpu.IF.pc_load & (dut.cpu.IF.pc_ff > dut.cpu.IF.pc_out);
 assign rvfi.halt = (dut.cpu.ID.regfile.data[1] == 32'h600D600D) | (dut.cpu.ID.regfile.data[1] == 32'h0000000F);
 /***************************** End Instantiation *****************************/
+
+
+
 
 endmodule

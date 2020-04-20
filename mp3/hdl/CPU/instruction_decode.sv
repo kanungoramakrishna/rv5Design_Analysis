@@ -49,6 +49,8 @@ rv32i_word CMPin;
 rv32i_word reg_a;
 rv32i_word reg_b;
 
+// logic stall; // TODO connect this 
+
 //Regfile
 regfile regfile(
 	.clk   (clk   ),
@@ -61,6 +63,12 @@ regfile regfile(
     .reg_a (reg_a ),
     .reg_b (reg_b )
 );
+
+// hazard_unit hazU (
+//     .instr (data_),
+//     .ctrl  (ctrl),
+//     .stall (stall)
+// );
 
 //CW module
 control_rom control_rom(.*, .data(data_));
