@@ -42,6 +42,7 @@ logic [1:0] mask_out;
 //connected to registered outputs of fetch
 rv32i_word instruction_IF_DE;
 rv32i_word PC_IF_DE;
+logic bubble;   // Forwardin 
 
 //Signals between decode and execute
 //connected to registered outputs of decode
@@ -67,6 +68,9 @@ rv32i_word rs2_EXE_MA;
 pcmux_sel_t pcmux_sel;
 rv32i_word alu_out_to_PC;
 logic br_taken;
+
+rv32i_control_word mem_wb;      // Forwarding
+rv32i_word         mem_wb_data; 
 
 
 //Signals between memory access and write back
@@ -147,6 +151,8 @@ instruction_execute EXE(
     .rs2                   (rs2_ID_EXE),
     .cmp_in                (CMPin_ID_EXE),
     .ctrl_word_in          (ctrl_ID_EXE  ),
+    .mem_wb                (mem_wb),
+    .mem_wb_data           (mem_wb_data)
 
     //Registered outputs
     .ctrl_word_out         (ctrl_EXE_MA ),
