@@ -15,6 +15,8 @@ module instruction_execute
   input rv32i_control_word ctrl_word_in,
   input logic IF_stall,
   input logic MA_stall,
+  input rv32i_control_word mem_wb, // Forwarding, ctrl_word_out
+  input rv32i_word mem_wb_data,    // Forwarding, alu_output_out
 
   output rv32i_control_word ctrl_word_out,
   output rv32i_word instruction_out,
@@ -31,11 +33,13 @@ module instruction_execute
 rv32i_word alu_o;
 logic [3:0] mem_byte_enable;
 logic br_en;
+logic [1:0] fwd_alu [1:0];
+rv32i_word alu_input_1, alu_input_2;
 
 alu alu (
   .aluop (ctrl_word_in.aluop),
-  .a (alu_in_1),
-  .b (alu_in_2),
+  .a (alu_input_1),
+  .b (alu_input_2),
   .f (alu_o),
   .alu_out_to_PC (alu_out_to_PC)
 );
@@ -46,13 +50,31 @@ cmp cmp (
   .cmpop (ctrl_word_in.cmpop)
 );
 
-// ex_forward_unit EFU (
-//   // TODO
-// );
+ex_forward_unit EFU (
+  .instr       (instruction_in),
+  .id_ex       (ctrl_word_in),
+  .ex_mem      (ctrl_word_out),
+  .mem_wb      (mem_wb),
+  .fwd_alu     (fwd_alu)  // array of logic [1:0]
+);
 
 
 
 always_comb begin
+
+  // Forwarding Muxes
+  unique case (fwd_alu[0])
+    default: alu_input_1 = alu_in_1;
+    2'b01:   alu_input_1 = alu_out;     // Data from EX/MEM
+    2'b10:   alu_input_1 = mem_wb_data; // Data from ID/EX
+  endcase
+
+  unique case (fwd_alu[1]) 
+    default: alu_input_2 = alu_in_2;
+    2'b01:   alu_input_2 = alu_out;     // Data from EX/MEM
+    2'b10:   alu_input_2 = mem_wb_data; // Data from ID/EX
+  endcase
+
   //set byte enable
   //note that rs2 (write data) must be masked using byte enable,
   //done in mem_access stage to reduce logic in this stage
