@@ -20,6 +20,8 @@ always_comb
 begin
     id_ex_rs1 = 0;
     id_ex_rs2 = 0;
+    fwd_alu[0] = 2'b00;
+    fwd_alu[1] = 2'b00;
 
     case (id_ex.opcode)
         op_lui,op_auipc,op_jal,op_jal:
