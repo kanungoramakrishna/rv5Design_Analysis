@@ -7,7 +7,7 @@ module ex_forward_unit
     output logic [1:0] fwd_alu [1:0]
 );
 
-logic [4:0] id_ex_rs1,id_ex_rs2; 
+rv32i_reg id_ex_rs1, id_ex_rs2; 
 
 /*
 fwd == 00   Data from ID/EX
@@ -52,7 +52,7 @@ begin
         begin 
             fwd_alu[1] = 2'b10;
         end
-    end else if (mem_wb.load_regfile && mem.wb_rd != 0)
+    end else if (mem_wb.load_regfile && mem_wb.rd != 0)
     begin
         if (mem_wb.rd == id_ex_rs1)
         begin

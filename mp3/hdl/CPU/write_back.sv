@@ -22,7 +22,7 @@ module write_back
 logic [31:0] regfilemux_out;
 
 //To IF
-assign alu_out_to_PC = alu_in;
+//assign alu_out_to_PC = alu_in;
 //assign pcmux_sel = ctrl_word_in.pcmux_sel;
 
 //To ID to write to registers

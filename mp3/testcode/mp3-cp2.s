@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #  mp3-cp2.s version 1.0
 .align 4
 .section .text

@@ -8,8 +8,10 @@ module mem_forward_unit
 	input  rv32i_control_word mem_wb,
 	input  rv32i_word         mem_wb_address, 
 	input  rv32i_word         mem_wb_instr, 
-	output logic              fwd, 
+	output logic              fwd
 );
+
+rv32i_reg ex_mem_rs2, mem_wb_rd;
 
 always_comb
 begin
