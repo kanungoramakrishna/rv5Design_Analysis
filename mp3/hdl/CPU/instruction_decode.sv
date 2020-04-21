@@ -55,7 +55,7 @@ rv32i_word reg_b;
 regfile regfile(
 	.clk   (clk   ),
     .rst   (rst   ),
-    .load  (load_regfile  ),
+    .load  (load_regfile && !(MA_stall) ),
     .in    (rd_in    ),
     .src_a (data_[19:15]),
     .src_b (data_[24:20]),
