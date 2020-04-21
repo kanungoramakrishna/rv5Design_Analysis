@@ -42,7 +42,7 @@ logic [1:0] mask_out;
 //connected to registered outputs of fetch
 rv32i_word instruction_IF_DE;
 rv32i_word PC_IF_DE;
-logic bubble;   // Forwarding 
+logic bubble;   // Forwarding
 
 //Signals between decode and execute
 //connected to registered outputs of decode
@@ -78,8 +78,10 @@ rv32i_word PC_MA_WB;
 rv32i_word PC_plus4_MA_WB;
 logic [3:0] mask_MA_WB;
 rv32i_word r_data_MA_WB;
+rv32i_word w_data_MA_WB;
 rv32i_word br_MA_WB;
 rv32i_word alu_MA_WB;
+rv32i_word data_addr_MA_WB;
 
 
 //Other signals
@@ -100,7 +102,7 @@ instruction_fetch IF(
     .pcmux_sel  (pcmux_sel ),
     .alu_out    (alu_out_to_PC),
     .br_taken   (br_taken),
-    .bubble     (bubble),    // Forwarding 
+    .bubble     (bubble),    // Forwarding
 
     .inst_resp  (inst_resp),
     .inst_rdata (inst_rdata ),
@@ -194,10 +196,12 @@ memory_access MA(
     .instruction_out            (instruction_MA_WB),
     .mem_byte_enable_out        (mask_MA_WB),
     .r_data_out                 (r_data_MA_WB),
+    .w_data_out                 (w_data_MA_WB),
     .br_en_out                  (br_MA_WB),
     .PC_out                     (PC_MA_WB),
     .PC_plus4_out               (PC_plus4_MA_WB),
-    .alu_output_out             (alu_MA_WB)
+    .alu_output_out             (alu_MA_WB),
+    .data_addr_MA_WB            (data_addr_MA_WB)
 );
 
 write_back WB(
@@ -206,9 +210,11 @@ write_back WB(
     .instruction_in         (instruction_MA_WB),
     .ctrl_word_in           (ctrl_MA_WB ),
     .mem_byte_enable_in     (mask_MA_WB),
+    .w_data_in              (w_data_MA_WB),
     .r_data_in              (r_data_MA_WB),
     .alu_in                 (alu_MA_WB),
     .br_en_in               (br_MA_WB),
+    .data_addr_in        (data_addr_MA_WB),
 
 
     .load_regfile           (load_regfile),

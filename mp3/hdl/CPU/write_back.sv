@@ -9,9 +9,10 @@ module write_back
     input rv32i_control_word ctrl_word_in,
     input [3:0] mem_byte_enable_in,
     input rv32i_word r_data_in,
+    input rv32i_word w_data_in,
     input rv32i_word alu_in,
     input rv32i_word br_en_in,
-
+    input rv32i_word data_addr_in,
 
     //To regfile (ID)
     output logic load_regfile,
@@ -82,4 +83,142 @@ begin
         default:;
     endcase
 end
+
+//synthesis translate_off
+
+RVFIMonPacket packet;
+
+always_comb begin
+  packet.instruction = instruction_in;
+
+  unique case (ctrl_word_in.opcode)
+    op_lui: begin
+      packet.rs1_addr = 0;
+      packet.rs2_addr = 0;
+      packet.rd_addr = rd;
+      packet.rd_data = rd_in;
+      packet.pc_rdata = PC_in;
+      packet.pc_wdata = PC_plus4_in;
+      packet.mem_rmask = 0;
+      packet.mem_wmask = 0;
+      packet.mem_rdata = 0;
+      packet.mem_wdata = 0;
+      packet.mem_addr = 0;
+    end
+    op_auipc: begin
+      packet.rs1_addr = 0;
+      packet.rs2_addr = 0;
+      packet.rd_addr = rd;
+      packet.rd_data = rd_in;
+      packet.pc_rdata = PC_in;
+      packet.pc_wdata = alu_in;
+      packet.mem_rmask = 0;
+      packet.mem_wmask = 0;
+      packet.mem_rdata = 0;
+      packet.mem_wdata = 0;
+      packet.mem_addr = 0;
+    end
+    op_jal: begin
+      packet.rs1_addr = 0;
+      packet.rs2_addr = 0;
+      packet.rd_addr = rd;
+      packet.rd_data = rd_in;
+      packet.pc_rdata = PC_in;
+      packet.pc_wdata = alu_in;
+      packet.mem_rmask = 0;
+      packet.mem_wmask = 0;
+      packet.mem_rdata = 0;
+      packet.mem_wdata = 0;
+      packet.mem_addr = 0;
+    end
+    op_jalr: begin
+      packet.rs1_addr = instruction_in[19:15];
+      packet.rs2_addr = 0;
+      packet.rd_addr = rd;
+      packet.rd_data = rd_in;
+      packet.pc_rdata = PC_in;
+      packet.pc_wdata = alu_in;
+      packet.mem_rmask = 0;
+      packet.mem_wmask = 0;
+      packet.mem_rdata = 0;
+      packet.mem_wdata = 0;
+      packet.mem_addr = 0;
+    end
+    op_br: begin
+      packet.rs1_addr = instruction_in[19:15];
+      packet.rs2_addr = instruction_in[24:20];
+      packet.rd_addr = 0;
+      packet.rd_data = 0;
+      packet.pc_rdata = PC_in;
+      packet.pc_wdata = alu_in;
+      packet.mem_rmask = 0;
+      packet.mem_wmask = 0;
+      packet.mem_rdata = 0;
+      packet.mem_wdata = 0;
+      packet.mem_addr = 0;
+    end
+    op_load: begin
+      packet.rs1_addr = instruction_in[19:15];
+      packet.rs2_addr = 0;
+      packet.rd_addr = rd;
+      packet.rd_data = rd_in;
+      packet.pc_rdata = PC_in;
+      packet.pc_wdata = PC_plus4_in;
+      packet.mem_rmask = mem_byte_enable_in;
+      packet.mem_wmask = 0;
+      packet.mem_rdata = r_data_in;
+      packet.mem_wdata = 0;
+      packet.mem_addr = data_addr_in;
+    end
+    op_store: begin
+      packet.rs1_addr = instruction_in[19:15];
+      packet.rs2_addr = instruction_in[24:20];
+      packet.rd_addr = 0;
+      packet.rd_data = 0;
+      packet.pc_rdata = PC_in;
+      packet.pc_wdata = PC_plus4_in;
+      packet.mem_rmask = 0;
+      packet.mem_wmask = mem_byte_enable_in;
+      packet.mem_rdata = 0;
+      packet.mem_wdata = w_data_in;
+      packet.mem_addr = data_addr_in;
+    end
+    op_imm: begin
+      packet.rs1_addr = instruction_in[19:15];
+      packet.rs2_addr = 0;
+      packet.rd_addr = rd;
+      packet.rd_data = rd_in;
+      packet.pc_rdata = PC_in;
+      packet.pc_wdata = PC_plus4_in;
+      packet.mem_rmask = 0;
+      packet.mem_wmask = 0;
+      packet.mem_rdata = 0;
+      packet.mem_wdata = 0;
+      packet.mem_addr = 0;
+    end
+    op_reg: begin
+      packet.rs1_addr = instruction_in[19:15];
+      packet.rs2_addr = instruction_in[24:20];
+      packet.rd_addr = rd;
+      packet.rd_data = rd_in;
+      packet.pc_rdata = PC_in;
+      packet.pc_wdata = PC_plus4_in;
+      packet.mem_rmask = 0;
+      packet.mem_wmask = 0;
+      packet.mem_rdata = 0;
+      packet.mem_wdata = 0;
+      packet.mem_addr = 0;
+    end
+    default: begin
+      packet = 0;
+    end
+  endcase
+end
+
+//synthesis translate_on
+
+
+
+
+
 endmodule

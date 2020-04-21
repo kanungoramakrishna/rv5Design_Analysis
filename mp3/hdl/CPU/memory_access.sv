@@ -24,10 +24,12 @@ output rv32i_control_word ctrl_word_out,
 output rv32i_word instruction_out,
 output logic [3:0] mem_byte_enable_out,
 output logic [31:0] r_data_out, //output to next stage, not output to memory
+output logic [31:0] w_data_out,
 output logic [31:0] br_en_out,
 output logic [31:0] PC_plus4_out,
 output logic [31:0] PC_out,
 output logic [31:0] alu_output_out,
+output logic [31:0] data_addr_MA_WB,
 output logic MA_stall
 );
 
@@ -49,7 +51,7 @@ assign data_wdata = (fwd) ? r_data_out : rs2_out;
 assign data_read = ctrl_word_in.read;
 assign data_write = ctrl_word_in.write;
 
-always_comb 
+always_comb
 begin
   if((ctrl_word_in.read || ctrl_word_in.write))
   begin
@@ -78,11 +80,13 @@ always_ff @(posedge clk) begin
     instruction_out <= instruction_in;
     mem_byte_enable_out <= mem_byte_enable_in;
     //rdata holds its value until resp goes high from memory, but for now we will always get once cycle hit
+    w_data_out <= data_wdata;
     r_data_out <= (fwd) ? r_data_out : data_rdata_in;
-    br_en_out <= {31'b0,br_en_in}; 
+    br_en_out <= {31'b0,br_en_in};
     PC_plus4_out <= PC_in +4;
     PC_out <= PC_in;
     alu_output_out <= alu_output_in;
+    data_addr_MA_WB <= data_addr;
   end
 end
 endmodule
