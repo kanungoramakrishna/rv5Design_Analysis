@@ -7,7 +7,7 @@
 
 // Set these to 1 to enable the feature
 `define USE_SHADOW_MEMORY 1
-`define USE_RVFI_MONITOR 1
+`define USE_RVFI_MONITOR 0
 
 module source_tb(
     tb_itf.magic_mem magic_mem_itf,
@@ -67,7 +67,7 @@ generate
           .reset (itf.rst),
           .rvfi_valid (rvfi.commit),
           .rvfi_order (rvfi.order),
-          .rvfi_insn (dut.cpu.IF.instr_ff),
+          .rvfi_insn (dut.cpu.WB.packet.instruction),
           .rvfi_trap(1'b0),
           .rvfi_halt(rvfi.halt),
           .rvfi_intr(1'b0),
@@ -76,8 +76,8 @@ generate
           .rvfi_rs2_addr(dut.cpu.WB.packet.rs2_addr),
           .rvfi_rs1_rdata(monitor.rvfi_rs1_addr ? dut.cpu.ID.rs1_out : 0),
           .rvfi_rs2_rdata(monitor.rvfi_rs2_addr ? dut.cpu.ID.rs2_out : 0),
-          .rvfi_rd_addr(dut.cpu.ID.load_regfile ? dut.cpu.WB.packet.rd : 5'h0),
-          .rvfi_rd_wdata(monitor.rvfi_rd_addr ? dut.cpu.WB.packet.rd_in : 0),
+          .rvfi_rd_addr(dut.cpu.ID.load_regfile ? dut.cpu.WB.packet.rd_addr : 5'h0),
+          .rvfi_rd_wdata(monitor.rvfi_rd_addr ? dut.cpu.WB.packet.rd_data : 0),
           .rvfi_pc_rdata(dut.cpu.WB.packet.pc_rdata),
           .rvfi_pc_wdata(dut.cpu.WB.packet.pc_wdata),
           .rvfi_mem_addr(dut.cpu.WB.packet.mem_addr),
