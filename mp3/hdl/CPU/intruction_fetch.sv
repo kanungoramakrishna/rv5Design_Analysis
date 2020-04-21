@@ -56,9 +56,11 @@ always_ff @(posedge clk) begin
 	if (rst) begin
 		instr_ff <= 32'b0;
 	end
-	else if ((IF_stall &&  (!(MA_stall))) || br_taken)
+	else if (!(bubble))
+	begin
+	if ((IF_stall &&  (!(MA_stall))) || br_taken)
 		instr_ff <= 32'h00000013;
-	else if (!(MA_stall || bubble)) begin
+	else if (!(MA_stall))
 		instr_ff <= inst_rdata;
 	end
 end
