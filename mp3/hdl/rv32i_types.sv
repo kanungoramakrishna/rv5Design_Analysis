@@ -85,6 +85,19 @@ typedef struct packed {
 
 } rv32i_control_word;
 
-
+typedef struct packed {
+	rv32i_word instruction;
+	rv32i_reg rs1_addr;
+	rv32i_reg rs2_addr;
+  rv32i_reg rd_addr;
+  rv32i_word rd_data;
+  rv32i_word pc_rdata;
+  rv32i_word pc_wdata;
+  logic [3:0] mem_rmask;
+  logic [3:0] mem_wmask;
+  rv32i_word mem_rdata;
+  rv32i_word mem_wdata;
+  rv32i_word mem_addr;
+} RVFIMonPacket;
 
 endpackage : rv32i_types

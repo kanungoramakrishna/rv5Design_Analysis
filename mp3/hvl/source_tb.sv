@@ -7,7 +7,7 @@
 
 // Set these to 1 to enable the feature
 `define USE_SHADOW_MEMORY 1
-`define USE_RVFI_MONITOR 0
+`define USE_RVFI_MONITOR 1
 
 module source_tb(
     tb_itf.magic_mem magic_mem_itf,
@@ -72,19 +72,19 @@ generate
           .rvfi_halt(rvfi.halt),
           .rvfi_intr(1'b0),
           .rvfi_mode(2'b00),
-          .rvfi_rs1_addr(dut.cpu.ID.regfile.src_a),
-          .rvfi_rs2_addr(dut.cpu.ID.regfile.src_b),
+          .rvfi_rs1_addr(dut.cpu.WB.packet.rs1_addr),
+          .rvfi_rs2_addr(dut.cpu.WB.packet.rs2_addr),
           .rvfi_rs1_rdata(monitor.rvfi_rs1_addr ? dut.cpu.ID.rs1_out : 0),
           .rvfi_rs2_rdata(monitor.rvfi_rs2_addr ? dut.cpu.ID.rs2_out : 0),
-          .rvfi_rd_addr(dut.cpu.ID.load_regfile ? dut.cpu.ID.rd : 5'h0),
-          .rvfi_rd_wdata(monitor.rvfi_rd_addr ? dut.cpu.ID.rd_in : 0),
-          .rvfi_pc_rdata(dut.cpu.IF.pc_ff),
-          .rvfi_pc_wdata(dut.cpu.IF.pc_in),
-          .rvfi_mem_addr(itf.data_addr),
-          .rvfi_mem_rmask(dut.cpu.data_mbe),
-          .rvfi_mem_wmask(dut.cpu.data_mbe),
-          .rvfi_mem_rdata(dut.cpu.data_rdata),
-          .rvfi_mem_wdata(dut.cpu.data_wdata),
+          .rvfi_rd_addr(dut.cpu.ID.load_regfile ? dut.cpu.WB.packet.rd : 5'h0),
+          .rvfi_rd_wdata(monitor.rvfi_rd_addr ? dut.cpu.WB.packet.rd_in : 0),
+          .rvfi_pc_rdata(dut.cpu.WB.packet.pc_rdata),
+          .rvfi_pc_wdata(dut.cpu.WB.packet.pc_wdata),
+          .rvfi_mem_addr(dut.cpu.WB.packet.mem_addr),
+          .rvfi_mem_rmask(dut.cpu.WB.packet.mem_rmask),
+          .rvfi_mem_wmask(dut.cpu.WB.packet.mem_wmask),
+          .rvfi_mem_rdata(dut.cpu.WB.packet.mem_rdata),
+          .rvfi_mem_wdata(dut.cpu.WB.packet.mem_wdata),
           .rvfi_mem_extamo(1'b0),
           .errcode(rvfi.errcode)
         );
