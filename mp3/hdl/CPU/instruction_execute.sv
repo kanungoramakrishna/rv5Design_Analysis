@@ -65,10 +65,6 @@ always_comb begin
 
   // Forwarding Muxes
   unique case (fwd_alu[0])
-    default: begin
-      alu_input_1 = alu_in_1;
-      cmp_input_1 = rs1_out;
-    end
     2'b01: begin
       alu_input_1 = mem_wb_data;     // Data from MA/WB
       cmp_input_1 = mem_wb_data;
@@ -77,14 +73,14 @@ always_comb begin
       alu_input_1 = alu_out; // Data from EX/MEM
       cmp_input_1 = alu_out;
     end
-
+    default: begin
+      alu_input_1 = alu_in_1;
+      cmp_input_1 = rs1_out;
+    end
   endcase
 
   unique case (fwd_alu[1])
-    default: begin
-      alu_input_2 = alu_in_2;
-      cmp_input_2 = cmp_in;
-    end
+
     2'b01: begin
       alu_input_2 = mem_wb_data;     // Data from MA/WB
       cmp_input_2 = mem_wb_data;
@@ -92,6 +88,10 @@ always_comb begin
     2'b10:  begin
       alu_input_2 = alu_out; // Data from EX/MEM
       cmp_input_2 = alu_out;
+    end
+    default: begin
+      alu_input_2 = alu_in_2;
+      cmp_input_2 = cmp_in;
     end
   endcase
 
@@ -124,18 +124,18 @@ if (ctrl_word_in.opcode == op_store || ctrl_word_in.opcode == op_load) begin
           mem_byte_enable = 4'b1000;
       endcase
     end
-    lw: begin
-      unique case (alu_o[1:0])
-        2'b00:
-          mem_byte_enable = 4'b1111;
-        2'b01:
-          mem_byte_enable = 4'b1110;
-        2'b10:
-          mem_byte_enable = 4'b1100;
-        2'b11:
-          mem_byte_enable = 4'b1000;
-      endcase
-    end
+    // lw: begin
+    //   unique case (alu_o[1:0])
+    //     2'b00:
+    //       mem_byte_enable = 4'b1111;
+    //     2'b01:
+    //       mem_byte_enable = 4'b1110;
+    //     2'b10:
+    //       mem_byte_enable = 4'b1100;
+    //     2'b11:
+    //       mem_byte_enable = 4'b1000;
+    //   endcase
+    // end
     lb, lbu: begin
       unique case (alu_o[1:0])
         2'b00:

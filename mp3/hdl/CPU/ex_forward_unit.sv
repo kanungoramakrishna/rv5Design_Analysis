@@ -43,7 +43,17 @@ begin
         end
     endcase
 
-
+    if (mem_wb.load_regfile && mem_wb.rd != 0)
+    begin
+        if (mem_wb.rd == id_ex_rs1)
+        begin
+            fwd_alu[0] = 2'b01;
+        end
+        if (mem_wb.rd == id_ex_rs2)
+        begin
+            fwd_alu[1] = 2'b01;
+        end
+    end
     if (ex_mem.load_regfile && ex_mem.rd != 0)
     begin
         if (ex_mem.rd == id_ex_rs1)
@@ -53,16 +63,6 @@ begin
         if (ex_mem.rd == id_ex_rs2)
         begin
             fwd_alu[1] = 2'b10;
-        end
-    end else if (mem_wb.load_regfile && mem_wb.rd != 0)
-    begin
-        if (mem_wb.rd == id_ex_rs1)
-        begin
-            fwd_alu[0] = 2'b01;
-        end
-        if (mem_wb.rd == id_ex_rs2)
-        begin
-            fwd_alu[1] = 2'b01;
         end
     end
 end
