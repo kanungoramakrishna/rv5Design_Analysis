@@ -15,6 +15,9 @@ input rv32i_word data_rdata_in, //read word from memory
 input data_resp,
 input logic IF_stall,
 
+input rv32i_word alu_input_1_rvfi_in,  //outputs for rvfi monitor
+input rv32i_word alu_input_2_rvfi_in,
+
 output logic [31:0] data_addr,
 output logic [31:0] data_wdata,
 output logic [3:0] data_mbe,
@@ -30,7 +33,10 @@ output logic [31:0] PC_plus4_out,
 output logic [31:0] PC_out,
 output logic [31:0] alu_output_out,
 output logic [31:0] data_addr_MA_WB,
-output logic MA_stall
+output logic MA_stall,
+
+output rv32i_word alu_input_1_rvfi_o,  //rs1, rs2 (can be forwarded) for rvfi monitor
+output rv32i_word alu_input_2_rvfi_o
 );
 
 logic fwd;
@@ -74,6 +80,8 @@ always_ff @(posedge clk) begin
     PC_out <= 0;
     PC_plus4_out <= 0;
     alu_output_out <= 0;
+    alu_input_1_rvfi_o <= 0;
+    alu_input_2_rvfi_o <= 0;
   end
   else if (!MA_stall) begin
     ctrl_word_out <= ctrl_word_in;
@@ -87,6 +95,9 @@ always_ff @(posedge clk) begin
     PC_out <= PC_in;
     alu_output_out <= alu_output_in;
     data_addr_MA_WB <= data_addr;
+
+    alu_input_1_rvfi_o <= alu_input_1_rvfi_in;
+    alu_input_2_rvfi_o <= alu_input_2_rvfi_in;
   end
 end
 endmodule

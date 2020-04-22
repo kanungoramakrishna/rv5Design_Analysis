@@ -65,6 +65,9 @@ always_comb
 begin
     set_defaults();
     /* Assign control signals based on opcode */
+  if (data == 32'b00000000000000000000000000010011) begin
+  end
+  else begin
     case (ctrl.opcode)
         op_lui :
             loadRegfile(regfilemux::u_imm);
@@ -76,17 +79,17 @@ begin
         op_jal :
         begin
             loadRegfile(regfilemux::pc_plus4);
-            setALU(alumux::pc_out, alumux::j_imm,1'b1, alu_add); 
-            ctrl.pcmux_sel = pcmux::alu_out; 
+            setALU(alumux::pc_out, alumux::j_imm,1'b1, alu_add);
+            ctrl.pcmux_sel = pcmux::alu_out;
         end
         op_jalr :
         begin
             loadRegfile(regfilemux::pc_plus4);
             setALU(alumux::rs1_out, alumux::i_imm,1'b1, alu_add);
-            ctrl.pcmux_sel = pcmux::alu_mod2; 
+            ctrl.pcmux_sel = pcmux::alu_mod2;
         end
 
-        
+
         op_br :
         begin
             setALU(alumux::pc_out,alumux::b_imm,1'b1,alu_add);
@@ -179,5 +182,6 @@ begin
             ctrl = 0;   /* Unknown opcode, set control word to zero */
         end
     endcase
+  end
 end
 endmodule : control_rom

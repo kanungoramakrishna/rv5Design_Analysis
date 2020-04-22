@@ -7,7 +7,7 @@
 
 // Set these to 1 to enable the feature
 `define USE_SHADOW_MEMORY 1
-`define USE_RVFI_MONITOR 0
+`define USE_RVFI_MONITOR 1
 
 module source_tb(
     tb_itf.magic_mem magic_mem_itf,
@@ -27,6 +27,12 @@ end
 
 /**************************** Halting Conditions *****************************/
 int timeout = 100000000;
+logic [31:0] rs1_data, rs2_data;
+
+always @(negedge tb_itf.clk) begin
+  rs1_data <= dut.cpu.WB.packet.rs1_addr ? dut.cpu.ID.regfile.data[dut.cpu.WB.packet.rs1_addr] : 0;
+  rs2_data <= dut.cpu.WB.packet.rs2_addr ? dut.cpu.ID.regfile.data[dut.cpu.WB.packet.rs2_addr] : 0;
+end
 
 always @(posedge tb_itf.clk) begin
     if (rvfi.halt)
@@ -74,8 +80,8 @@ generate
           .rvfi_mode(2'b00),
           .rvfi_rs1_addr(dut.cpu.WB.packet.rs1_addr),
           .rvfi_rs2_addr(dut.cpu.WB.packet.rs2_addr),
-          .rvfi_rs1_rdata(monitor.rvfi_rs1_addr ? dut.cpu.ID.rs1_out : 0),
-          .rvfi_rs2_rdata(monitor.rvfi_rs2_addr ? dut.cpu.ID.rs2_out : 0),
+          .rvfi_rs1_rdata(rs1_data),
+          .rvfi_rs2_rdata(rs2_data),
           .rvfi_rd_addr(dut.cpu.ID.load_regfile ? dut.cpu.WB.packet.rd_addr : 5'h0),
           .rvfi_rd_wdata(monitor.rvfi_rd_addr ? dut.cpu.WB.packet.rd_data : 0),
           .rvfi_pc_rdata(dut.cpu.WB.packet.pc_rdata),

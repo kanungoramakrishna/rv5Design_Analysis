@@ -27,7 +27,10 @@ module instruction_execute
   output rv32i_word rs2_out,
   output logic br_en_out,
   output logic [3:0] mem_byte_enable_out,
-  output logic br_taken
+  output logic br_taken,
+
+  output rv32i_word alu_input_1_o,  //outputs for rvfi monitor
+  output rv32i_word alu_input_2_o
 );
 
 rv32i_word alu_o;
@@ -124,18 +127,18 @@ if (ctrl_word_in.opcode == op_store || ctrl_word_in.opcode == op_load) begin
           mem_byte_enable = 4'b1000;
       endcase
     end
-    // lw: begin
-    //   unique case (alu_o[1:0])
-    //     2'b00:
-    //       mem_byte_enable = 4'b1111;
-    //     2'b01:
-    //       mem_byte_enable = 4'b1110;
-    //     2'b10:
-    //       mem_byte_enable = 4'b1100;
-    //     2'b11:
-    //       mem_byte_enable = 4'b1000;
-    //   endcase
-    // end
+    lw: begin
+      unique case (alu_o[1:0])
+        2'b00:
+          mem_byte_enable = 4'b1111;
+        2'b01:
+          mem_byte_enable = 4'b1110;
+        2'b10:
+          mem_byte_enable = 4'b1100;
+        2'b11:
+          mem_byte_enable = 4'b1000;
+      endcase
+    end
     lb, lbu: begin
       unique case (alu_o[1:0])
         2'b00:
@@ -161,6 +164,8 @@ always_ff @(posedge clk) begin
     rs2_out <= 0;
     br_en_out <= 0;
     mem_byte_enable_out <= 0;
+    alu_input_1_o <= 0;
+    alu_input_2_o <= 0;
   end
   else if (!MA_stall) begin
     ctrl_word_out <= ctrl_word_in;
@@ -170,6 +175,8 @@ always_ff @(posedge clk) begin
     rs2_out <= rs2;
     br_en_out <= br_en;
     mem_byte_enable_out <= mem_byte_enable;
+    alu_input_1_o <= alu_input_1;
+    alu_input_2_o <= alu_input_2;
   end
 end
 endmodule

@@ -34,6 +34,12 @@ rv32i_reg rs2;
 
 logic [1:0] mask_out;
 
+rv32i_word alu_input_1_EX_MA;
+rv32i_word alu_input_1_MA_WB;
+
+rv32i_word alu_input_2_EX_MA;
+rv32i_word alu_input_2_MA_WB;
+
 /*****************************************************************************/
 
 /**************************** Control Signals ********************************/
@@ -167,7 +173,9 @@ instruction_execute EXE(
     .mem_byte_enable_out   (mask_EXE_MA),
     .alu_out_to_PC         (alu_out_to_PC),
     .pcmux_sel             (pcmux_sel),
-    .br_taken              (br_taken)
+    .br_taken              (br_taken),
+    .alu_input_1_o         (alu_input_1_EX_MA),
+    .alu_input_2_o         (alu_input_2_EX_MA)
 );
 
 memory_access MA(
@@ -190,6 +198,8 @@ memory_access MA(
     .data_mbe                   (data_mbe),
     .data_read                  (data_read),
     .data_write                 (data_write),
+    .alu_input_1_rvfi_in         (alu_input_1_EX_MA),
+    .alu_input_2_rvfi_in         (alu_input_2_EX_MA),
 
     //Registered Outputs
     .ctrl_word_out              (ctrl_MA_WB ),
@@ -201,7 +211,9 @@ memory_access MA(
     .PC_out                     (PC_MA_WB),
     .PC_plus4_out               (PC_plus4_MA_WB),
     .alu_output_out             (alu_MA_WB),
-    .data_addr_MA_WB            (data_addr_MA_WB)
+    .data_addr_MA_WB            (data_addr_MA_WB),
+    .alu_input_1_rvfi_o         (alu_input_1_MA_WB),
+    .alu_input_2_rvfi_o         (alu_input_2_MA_WB)
 );
 
 write_back WB(

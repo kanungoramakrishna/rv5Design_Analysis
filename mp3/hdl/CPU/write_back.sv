@@ -22,10 +22,6 @@ module write_back
 
 logic [31:0] regfilemux_out;
 
-//To IF
-//assign alu_out_to_PC = alu_in;
-//assign pcmux_sel = ctrl_word_in.pcmux_sel;
-
 //To ID to write to registers
 assign load_regfile = ctrl_word_in.load_regfile;
 assign rd_in = regfilemux_out;
@@ -111,7 +107,7 @@ always_comb begin
       packet.rd_addr = rd;
       packet.rd_data = rd_in;
       packet.pc_rdata = PC_in;
-      packet.pc_wdata = alu_in;
+      packet.pc_wdata = PC_plus4_in;
       packet.mem_rmask = 0;
       packet.mem_wmask = 0;
       packet.mem_rdata = 0;
@@ -150,7 +146,7 @@ always_comb begin
       packet.rd_addr = 0;
       packet.rd_data = 0;
       packet.pc_rdata = PC_in;
-      packet.pc_wdata = alu_in;
+      packet.pc_wdata = br_en_in ? alu_in : PC_plus4_in;
       packet.mem_rmask = 0;
       packet.mem_wmask = 0;
       packet.mem_rdata = 0;
@@ -200,7 +196,7 @@ always_comb begin
       packet.rs1_addr = instruction_in[19:15];
       packet.rs2_addr = instruction_in[24:20];
       packet.rd_addr = rd;
-      packet.rd_data = rd_in;
+      packet.rd_data = rd ? rd_in : 0;
       packet.pc_rdata = PC_in;
       packet.pc_wdata = PC_plus4_in;
       packet.mem_rmask = 0;

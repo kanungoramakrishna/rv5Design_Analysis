@@ -19,8 +19,7 @@ source_tb tb(
 /************************ Signals necessary for monitor **********************/
 // This section not required until CP3
 
-assign rvfi.commit = dut.cpu.ID.load_regfile | dut.cpu.IF.pc_load; // Set high when a valid instruction is modifying regfile or PC
-//assign rvfi.halt = 0;   // Set high when you detect an infinite loop
+assign rvfi.commit = dut.cpu.ID.load_regfile | (dut.cpu.WB.ctrl_word_in.opcode == 7'b1100011) && (~dut.cpu.EXE.MA_stall) && (~dut.cpu.IF.bubble); // Set high when a valid instruction is modifying regfile or PC
 initial rvfi.order = 0;
 always @(posedge itf.clk iff rvfi.commit) rvfi.order <= rvfi.order + 1; // Modify for OoO
 /**************************** End RVFIMON signals ****************************/
