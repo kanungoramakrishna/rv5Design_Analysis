@@ -127,18 +127,18 @@ if (ctrl_word_in.opcode == op_store || ctrl_word_in.opcode == op_load) begin
           mem_byte_enable = 4'b1000;
       endcase
     end
-    lw: begin
-      unique case (alu_o[1:0])
-        2'b00:
-          mem_byte_enable = 4'b1111;
-        2'b01:
-          mem_byte_enable = 4'b1110;
-        2'b10:
-          mem_byte_enable = 4'b1100;
-        2'b11:
-          mem_byte_enable = 4'b1000;
-      endcase
-    end
+    // lw: begin
+    //   unique case (alu_o[1:0])
+    //     2'b00:
+    //       mem_byte_enable = 4'b1111;
+    //     2'b01:
+    //       mem_byte_enable = 4'b1110;
+    //     2'b10:
+    //       mem_byte_enable = 4'b1100;
+    //     2'b11:
+    //       mem_byte_enable = 4'b1000;
+    //   endcase
+    // end
     lb, lbu: begin
       unique case (alu_o[1:0])
         2'b00:
