@@ -19,7 +19,7 @@ source_tb tb(
 /************************ Signals necessary for monitor **********************/
 // This section not required until CP3
 
-assign rvfi.commit = dut.cpu.ID.load_regfile | (dut.cpu.WB.ctrl_word_in.opcode == 7'b1100011) && (~dut.cpu.EXE.MA_stall); // Set high when a valid instruction is modifying regfile or PC
+assign rvfi.commit = dut.cpu.ID.load_regfile | (dut.cpu.WB.ctrl_word_in.opcode == 7'b1100011) | (dut.cpu.WB.ctrl_word_in.opcode == 7'b0100011) && (~dut.cpu.EXE.MA_stall); // Set high when a valid instruction is modifying regfile or PC
 initial rvfi.order = 0;
 always @(posedge itf.clk iff rvfi.commit) rvfi.order <= rvfi.order + 1; // Modify for OoO
 /**************************** End RVFIMON signals ****************************/
