@@ -30,7 +30,9 @@ module instruction_execute
   output logic br_taken,
 
   output rv32i_word alu_input_1_o,  //outputs for rvfi monitor
-  output rv32i_word alu_input_2_o
+  output rv32i_word alu_input_2_o,
+  output leap,
+  output rv32i_word alu_frog
 );
 
 rv32i_word alu_o;
@@ -62,6 +64,13 @@ ex_forward_unit EFU (
   .fwd_alu     (fwd_alu)
 );
 
+leapfrog frog (
+  .instr        (instruction_in),
+  .ctrl_word_EX (ctrl_word_in),
+  .ctrl_word_MA (ctrl_word_out),
+  .miss         (MA_stall),
+  .leap         (leap)
+);
 
 
 always_comb begin
@@ -154,6 +163,9 @@ if (ctrl_word_in.opcode == op_store || ctrl_word_in.opcode == op_load) begin
   endcase
 end
 end
+
+assign alu_frog = alu_o;
+assign br_en_frog = br_en;
 
 always_ff @(posedge clk) begin
   if (rst) begin

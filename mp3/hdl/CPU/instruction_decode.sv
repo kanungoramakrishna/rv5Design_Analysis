@@ -15,6 +15,7 @@ module instruction_decode
     input  logic [4:0] rd,
     input  logic load_regfile,
     input logic br_taken,
+    input logic leap,
 
     output rv32i_control_word ctrl_out,
     output rv32i_word instruction_out,
@@ -125,7 +126,7 @@ begin
       rs1_out <= 32'b0;
       rs2_out <= 32'b0;
     end
-    else if (!MA_stall)
+    else if (!MA_stall || leap)
       begin
         PC_out <= PC;
         instruction_out <= data_;

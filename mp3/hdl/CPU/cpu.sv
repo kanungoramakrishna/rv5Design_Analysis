@@ -99,6 +99,9 @@ logic [4:0] rd;
 //stall, these are .*
 logic IF_stall;
 logic MA_stall;
+logic leap;
+rv32i_word alu_frog;
+logic br_en_frog;
 /*****************************************************************************/
 
 instruction_fetch IF(
@@ -217,16 +220,16 @@ memory_access MA(
 );
 
 write_back WB(
-	.PC_in                  (PC_MA_WB),
-    .PC_plus4_in            (PC_plus4_MA_WB),
-    .instruction_in         (instruction_MA_WB),
-    .ctrl_word_in           (ctrl_MA_WB ),
+	.PC_in                    (leap ? PC_ID_EXE : PC_MA_WB),
+    .PC_plus4_in            (leap ? PC_ID_EXE + 4 : PC_plus4_MA_WB),
+    .instruction_in         (leap ? instruction_ID_EXE : instruction_MA_WB),
+    .ctrl_word_in           (leap ? ctrl_ID_EXE : ctrl_MA_WB ),
     .mem_byte_enable_in     (mask_MA_WB),
     .w_data_in              (w_data_MA_WB),
     .r_data_in              (r_data_MA_WB),
-    .alu_in                 (alu_MA_WB),
-    .br_en_in               (br_MA_WB),
-    .data_addr_in        (data_addr_MA_WB),
+    .alu_in                 (leap ? alu_frog : alu_MA_WB),
+    .br_en_in               (leap ? br_en_frog : br_MA_WB),
+    .data_addr_in           (data_addr_MA_WB),
 
 
     .load_regfile           (load_regfile),
