@@ -42,17 +42,16 @@ module L2Cache #(
 );
 
 logic HIT;
-logic way_hit;
-logic [1:0] valid_out;
-logic [1:0] dirty_out;
-logic lru_data;
+logic [1:0] way_hit;
+logic [3:0] dirty_out;
+logic [1:0] lru_data;
 logic valid_in;
-logic lru_in_value;
+logic [2:0] lru_in_value;
 logic dirty_in_value;
 logic LD_LRU;
-logic [1:0] LD_TAG;
-logic [1:0] LD_DIRTY;
-logic [1:0] LD_VALID;
+logic [3:0] LD_TAG;
+logic [3:0] LD_DIRTY;
+logic [3:0] LD_VALID;
 logic [2:0] W_CACHE_STATUS;
 logic mem_resp_cache_control;
 logic cacheline_write_datapath;

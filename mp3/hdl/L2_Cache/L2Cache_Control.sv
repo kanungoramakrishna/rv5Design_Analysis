@@ -2,21 +2,20 @@ module L2Cache_Control (
   input logic clk,
   input logic rst,
   input logic HIT,
-  input logic way_hit,
+  input logic [1:0] way_hit,
   input logic mem_write_cpu,
   input logic mem_read_cpu,
-  input logic [1:0] valid_out,
-  input logic [1:0] dirty_out,
+  input logic [3:0] dirty_out,
   input logic pmem_resp,
-  input logic lru_data,
+  input logic [1:0]lru_data,
   output logic cacheline_read,
   output logic valid_in,
-  output logic lru_in_value,
+  output logic [2:0]lru_in_value,
   output logic dirty_in_value,
   output logic LD_LRU,
-  output logic [1:0] LD_TAG,
-  output logic [1:0] LD_DIRTY,
-  output logic [1:0] LD_VALID,
+  output logic [3:0] LD_TAG,
+  output logic [3:0] LD_DIRTY,
+  output logic [3:0] LD_VALID,
   output logic [2:0] W_CACHE_STATUS,
   output logic mem_resp_cpu
 );
@@ -89,23 +88,38 @@ always_comb begin
             if(mem_read_cpu & HIT)
             begin
                 unique case (way_hit)
-                1'b1:
-                    lru_in_value = 1'b0;
-                1'b0:
-                    lru_in_value = 1'b1;
+                2'b00:
+                    lru_in_value = {1'b1,lru_data[1],1'b1};
+                2'b01:
+                    lru_in_value = {1'b1,lru_data[1],1'b0};
+                2'b10:
+                    lru_in_value = {1'b0,1'b1,lru_data[0]};
+                2'b11:
+                    lru_in_value = {1'b0,1'b10,lru_data[0]};
                 endcase
             end
             if(mem_write_cpu & HIT)
             begin
                 W_CACHE_STATUS[2] = 1'b1;
-                lru_in_value = ~way_hit;
                 unique case (way_hit)
-                1'b0: begin
-                    LD_DIRTY[1:0] = 2'b01;
+                2'b00: begin
+                    lru_in_value = {1'b1,lru_data[1],1'b1}
+                    LD_DIRTY[3:0] = 4'b0001;
                     dirty_in_value = 1'b1;
                 end
-                1'b1: begin
-                    LD_DIRTY[1:0] = 2'b10;
+                2'b01: begin
+                    lru_in_value = {1'b1,lru_data[1],1'b0}
+                    LD_DIRTY[3:0] = 4'b0010;
+                    dirty_in_value = 1'b1;
+                end
+                2'b10: begin
+                    lru_in_value = {1'b0,1'b1,lru_data[0]}
+                    LD_DIRTY[3:0] = 4'b0100;
+                    dirty_in_value = 1'b1;
+                end
+                2'b11: begin
+                    lru_in_value = {1'b0,1'b10,lru_data[0]}
+                    LD_DIRTY[3:0] = 4'b1000;
                     dirty_in_value = 1'b1;
                 end
                 endcase
@@ -128,12 +142,7 @@ always_comb begin
             W_CACHE_STATUS = 3'b111;
             LD_TAG[lru_data] = 1'b1;
             valid_in = 1'b1;
-            unique case (lru_data)
-            1'b1:
-                LD_VALID[1:0] = 2'b10;
-            1'b0:
-                LD_VALID[1:0] = 2'b01;
-            endcase
+            LD_VALID[lru_data] = 1'b1;
             LD_DIRTY[lru_data] = 1'b1;
             dirty_in_value = 1'b0;
         end
