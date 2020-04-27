@@ -49,6 +49,7 @@ rv32i_word alu_input_2_MA_WB;
 rv32i_word instruction_IF_DE;
 rv32i_word PC_IF_DE;
 logic bubble;   // Forwarding
+logic false_NOP;
 
 //Signals between decode and execute
 //connected to registered outputs of decode

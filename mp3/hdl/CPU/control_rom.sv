@@ -6,6 +6,7 @@ module control_rom
 (
     input rv32i_word data,
     input [31:0] u_imm,
+    input logic false_NOP,
 
     output rv32i_control_word ctrl,
     output alumux1_sel_t alumux1_sel,
@@ -65,7 +66,10 @@ always_comb
 begin
     set_defaults();
     /* Assign control signals based on opcode */
-  if (data == 32'b00000000000000000000000000010011) begin
+
+  //do not set control word for inserted NOPs
+  if (false_NOP) begin
+
   end
   else begin
     case (ctrl.opcode)

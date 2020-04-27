@@ -18,7 +18,8 @@ module instruction_fetch
 	input  rv32i_word inst_rdata,
 	output logic      inst_read,
 	output rv32i_word inst_addr,
-	output logic      IF_stall
+	output logic      IF_stall,
+	output logic			false_NOP
 );
 
 logic pc_load;
@@ -55,14 +56,19 @@ always_ff @(posedge clk) begin
 	// Instruction Data
 	if (rst) begin
 		instr_ff <= 32'b0;
+		false_NOP <= 1'b0;
 	end
 	else if (!(bubble))
 	begin
-	if ((IF_stall &&  (!(MA_stall))) || br_taken)
+	if ((IF_stall &&  (!(MA_stall))) || br_taken) begin
 		instr_ff <= 32'h00000013;
-	else if (!(MA_stall))
-		instr_ff <= inst_rdata;
+		false_NOP <= 1'b1;
 	end
+	else if (!(MA_stall)) begin
+		instr_ff <= inst_rdata;
+		false_NOP <= 1'b0;
+	end
+end
 end
 
 always_comb begin
