@@ -15,6 +15,7 @@ module instruction_decode
     input  logic [4:0] rd,
     input  logic load_regfile,
     input logic br_taken,
+    input logic false_NOP,
 
     output rv32i_control_word ctrl_out,
     output rv32i_word instruction_out,

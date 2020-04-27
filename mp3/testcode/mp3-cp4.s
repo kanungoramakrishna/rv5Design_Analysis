@@ -615,7 +615,7 @@ Continue1_2:
     jal x7,  CalNEXT3
     sw x1, X2, x15
     sw x2, Y2, x15
-    
+
     lw x1, XX1
     lw x2, Y1
     jal x7,  CalAddress
@@ -623,13 +623,13 @@ Continue1_2:
     lw x7, 0(x5)
     add x6, x6, x7
     sw x6, 0(x5)
-    
+
     jal x7,  CalNEXT2
     addi x7, x1, 0
     bgt x0, x7, Done3
     sw x1, XX1, x15
     sw x2, Y1, x15
-    
+
     beq x0, x0, Continue1_2
 Done3:
 
@@ -638,7 +638,7 @@ Done3:
     sw x1, X2, x15
     sw  x1, Y1, x15
     sw  x1, Y2, x15
-    
+
     la x3,  M00
     lw x4, TWOFIVESIX
     add x4, x4, x4
@@ -655,7 +655,7 @@ Continue1_3:
     jal x7,  CalNEXT1
     sw x1, X2, x15
     sw x2, Y2, x15
-    
+
     lw x1, XX1
     lw x2, Y1
     jal x7,  CalAddress
@@ -663,13 +663,13 @@ Continue1_3:
     lw x7, 0(x5)
     add x6, x6, x7
     sw x6, 0(x5)
-    
+
     jal x7,  CalNEXT3
     addi x7, x1, 0
     bgt x0, x7, Done4
     sw x1, XX1, x15
     sw x2, Y1, x15
-    
+
     beq x0, x0, Continue1_3
 Done4:
 
@@ -720,7 +720,7 @@ SKip1:
 CalNEXT3:
 
     sw x3, TEMP3, x15
-    
+
     addi x3, x1, -15
     beq x0, x3, DRow
     addi x3, x2, 0
@@ -728,7 +728,7 @@ CalNEXT3:
     lw x3, NEGONEFIVE
     addi x3, x1, -15
     beq x0, x3, DRow
-    
+
     addi x1, x1, 1
     addi x2, x2, -1
     beq x0, x0, SKIP2
@@ -779,9 +779,9 @@ LoopRowsA:
     addi x1, x1, 4
     addi x2, x2, -1
     ble x0, x2, LoopRowsA
-    
+
     slli x4,x4,2
-    
+
     lw  x2, ONEFOURTHREE
 LoopRowsB:
     lw  x3, 0(x1)
@@ -791,7 +791,7 @@ LoopRowsB:
     ble x0, x2, LoopRowsB
 
     slli x5,x5,2
-    
+
     lw  x2, ONEFOURTHREE
 LoopRowsC:
     lw  x3, 0(x1)
@@ -799,9 +799,9 @@ LoopRowsC:
     addi x1, x1, 4
     addi x2, x2, -1
     ble x0, x2, LoopRowsC
-    
+
     slli x6,x6,2
-    
+
     lw  x2, ONEFOURTHREE
 LoopRowsD:
     lw  x3, 0(x1)
@@ -809,12 +809,12 @@ LoopRowsD:
     addi x1, x1, 4
     addi x2, x2, -1
     ble x0, x2, LoopRowsD
-    
+
     and x3, x3,x7
     not x7,x7
-    
-    
-    
+
+
+
     HALT:
     beq x0, x0, HALT
 
@@ -1658,4 +1658,3 @@ OFC:    .word           0x00000000
 OFD:    .word           0x00000000
 OFE:    .word           0x00000000
 OFF:    .word           0x00000000
-

@@ -28,11 +28,28 @@ end
 /**************************** Halting Conditions *****************************/
 int timeout = 100000000;
 logic [31:0] rs1_data, rs2_data;
+int unsigned stall_counter;
+
+always @(posedge tb_itf.clk) begin
+  if (dut.cpu.MA.MA_stall == 0) begin
+    stall_counter <= 0;
+  end
+  else begin
+    stall_counter <= stall_counter + 1'b1;
+  end
+end
 
 always @(negedge tb_itf.clk) begin
-  rs1_data <= dut.cpu.WB.packet.rs1_addr ? dut.cpu.ID.regfile.data[dut.cpu.WB.packet.rs1_addr] : 0;
-  rs2_data <= dut.cpu.WB.packet.rs2_addr ? dut.cpu.ID.regfile.data[dut.cpu.WB.packet.rs2_addr] : 0;
+  if (stall_counter > 0) begin
+    rs1_data <= rs1_data;
+    rs2_data <= rs2_data;
+  end
+  else begin
+    rs1_data <= dut.cpu.WB.packet.rs1_addr ? dut.cpu.ID.regfile.data[dut.cpu.WB.packet.rs1_addr] : 0;
+    rs2_data <= dut.cpu.WB.packet.rs2_addr ? dut.cpu.ID.regfile.data[dut.cpu.WB.packet.rs2_addr] : 0;
+  end
 end
+
 
 always @(posedge tb_itf.clk) begin
     if (rvfi.halt)

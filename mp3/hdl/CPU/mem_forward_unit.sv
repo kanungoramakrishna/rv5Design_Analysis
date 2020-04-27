@@ -30,13 +30,7 @@ begin
 	end
 
 	// ST then LD into same address 
-	if (ex_mem.opcode == op_load && mem_wb.opcode == op_store)
-	begin
-		if (ex_mem_address == mem_wb_address)
-		begin
-			fwd = 1;
-		end
-	end
+
 
 	/*
 	Store r3 into 0xFF
