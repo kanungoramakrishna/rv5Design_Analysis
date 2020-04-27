@@ -181,11 +181,7 @@ always_ff @(posedge clk) begin
     instruction_out <= instruction_in;
     PC_out <= PC_in;
     alu_out <= alu_o;
-<<<<<<< HEAD
-    rs2_out <= fwd_alu[1] == 2'b01 ? mem_wb_data : (fwd_alu[1] == 2'b10 ? alu_out : rs2);
-=======
     rs2_out <= rs2_fwd;
->>>>>>> 19258d9aef3afab6b8b4858bc973ec756a48d1a2
     br_en_out <= br_en;
     mem_byte_enable_out <= mem_byte_enable;
     alu_input_1_o <= alu_input_1;
