@@ -39,7 +39,7 @@ logic br_en;
 logic [1:0] fwd_alu [1:0];
 rv32i_word alu_input_1, alu_input_2;
 rv32i_word cmp_input_1, cmp_input_2;
-rv32i_word alu_o_pc_tmp; 
+rv32i_word alu_o_pc_tmp;
 
 alu alu (
   .aluop (ctrl_word_in.aluop),
@@ -177,7 +177,7 @@ always_ff @(posedge clk) begin
     instruction_out <= instruction_in;
     PC_out <= PC_in;
     alu_out <= alu_o;
-    rs2_out <= rs2;
+    rs2_out <= fwd_alu[1] == 2'b01 ? mem_wb_data : rs2;
     br_en_out <= br_en;
     mem_byte_enable_out <= mem_byte_enable;
     alu_input_1_o <= alu_input_1;
