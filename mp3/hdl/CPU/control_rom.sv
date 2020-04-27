@@ -23,7 +23,7 @@ function void set_defaults();
     /* Default assignments */
     ctrl.opcode = rv32i_opcode'(data[6:0]);
     ctrl.load_regfile = 1'b0;
-    ctrl.rd = data[11:7];
+    ctrl.rd = 0;
     ctrl.cmpop = branch_funct3_t'(funct3);
     ctrl.aluop = alu_add;
     ctrl.read = 1'b0;
@@ -40,6 +40,7 @@ endfunction
 function void loadRegfile(regfilemux::regfilemux_sel_t sel);
     ctrl.load_regfile = 1'b1;
     ctrl.regfilemux_sel = sel;
+    ctrl.rd = data[11:7];
 endfunction
 
 /*signals being set for ALU*/
