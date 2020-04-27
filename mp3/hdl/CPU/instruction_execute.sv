@@ -39,13 +39,14 @@ logic br_en;
 logic [1:0] fwd_alu [1:0];
 rv32i_word alu_input_1, alu_input_2;
 rv32i_word cmp_input_1, cmp_input_2;
+rv32i_word alu_o_pc_tmp; 
 
 alu alu (
   .aluop (ctrl_word_in.aluop),
   .a (alu_input_1),
   .b (alu_input_2),
   .f (alu_o),
-  .alu_out_to_PC (alu_out_to_PC)
+  .alu_out_to_PC (alu_o_pc_tmp)
 );
 
 cmp cmp (
@@ -99,6 +100,10 @@ always_comb begin
   endcase
 
   //PCMUX_sel
+  alu_out_to_PC = alu_in_1 + alu_in_2;
+  if (ctrl_word_in.opcode == op_jalr) begin
+    alu_out_to_PC = alu_o_pc_tmp;
+  end
 
   if(br_en || ctrl_word_in.opcode == op_jal || ctrl_word_in.opcode == op_jalr) begin
     pcmux_sel = ctrl_word_in.pcmux_sel;

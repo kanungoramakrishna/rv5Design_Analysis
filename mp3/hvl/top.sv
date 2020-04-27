@@ -59,7 +59,8 @@ mp3 dut(
 
 // Set this to the proper value
 assign itf.registers = dut.cpu.ID.regfile.data;
-assign rvfi.halt = (dut.cpu.ID.regfile.data[1] == 32'h600D600D) | (dut.cpu.ID.regfile.data[1] == 32'h0000000F) | (dut.cpu.ID.regfile.data[7] == 32'h600D600D);
+assign rvfi.halt = ((dut.cpu.ctrl_MA_WB.opcode == 7'b1100011) && (dut.cpu.instruction_IF_DE == dut.cpu.instruction_MA_WB) && (dut.cpu.PC_IF_DE == dut.cpu.PC_MA_WB)); 
+// assign rvfi.halt = (dut.cpu.ID.regfile.data[1] == 32'h600D600D) | (dut.cpu.ID.regfile.data[1] == 32'h0000000F) | (dut.cpu.ID.regfile.data[7] == 32'h600D600D);
 /***************************** End Instantiation *****************************/
 
 
