@@ -30,11 +30,12 @@ module L2Cache_Datapath #(
     output logic [255:0] mem_rdata256
 );
 
-logic [3:0][22:0] tag_out;
+logic [3:0][23:0] tag_out;
 logic [3:0][255:0] data_arr_out;
 logic [255:0] data_arr_in_value;
 logic [3:0] data_arr_write_en_in;
 logic [2:0] lru_out;
+logic [3:0] valid_out;
 
 //valid, dirty, LRU, and tag arrays for two ways//
 
@@ -42,8 +43,8 @@ L2_data_array valid_arr[3:0] (
     .*,
     .read (1'b1),
     .load (LD_VALID[3:0]),
-    .rindex (mem_address[8:5]),
-    .windex (mem_address[8:5]),
+    .rindex (mem_address[7:5]),
+    .windex (mem_address[7:5]),
     .datain (valid_in),
     .dataout (valid_out)
 );
@@ -52,8 +53,8 @@ L2_data_array dirty_arr[3:0] (
     .*,
     .read (1'b1),
     .load (LD_DIRTY[3:0]),
-    .rindex (mem_address[8:5]),
-    .windex (mem_address[8:5]),
+    .rindex (mem_address[7:5]),
+    .windex (mem_address[7:5]),
     .datain (dirty_in_value),
     .dataout (dirty_out)
 );
@@ -62,19 +63,19 @@ L2_data_array #(.width(3)) lru_arr (
     .*,
     .read (1'b1),
     .load (LD_LRU),
-    .rindex (mem_address[8:5]),
-    .windex (mem_address[8:5]),
+    .rindex (mem_address[7:5]),
+    .windex (mem_address[7:5]),
     .datain (lru_in_value),
     .dataout (lru_out)
 );
 
-L2_data_array #(.width(23)) tag_arr [3:0] (
+L2_data_array #(.width(24)) tag_arr [3:0] (
     .*,
     .read (1'b1),
     .load (LD_TAG[3:0]),
-    .rindex (mem_address[8:5]),
-    .windex (mem_address[8:5]),
-    .datain (mem_address[31:9]),
+    .rindex (mem_address[7:5]),
+    .windex (mem_address[7:5]),
+    .datain (mem_address[31:8]),
     .dataout (tag_out)
 );
 
@@ -82,8 +83,8 @@ L2_data_array  #(.width(256)) data_arr [3:0] (
     .*,
     .read (1'b1),
     .load (data_arr_write_en_in),
-    .rindex (mem_address[8:5]),
-    .windex (mem_address[8:5]),
+    .rindex (mem_address[7:5]),
+    .windex (mem_address[7:5]),
     .datain (data_arr_in_value),
     .dataout (data_arr_out)
 );
@@ -92,10 +93,10 @@ L2_data_array  #(.width(256)) data_arr [3:0] (
 always_comb begin
     set_defaults();
 
-    unique case ({mem_address[31:9] == tag_out[0] && valid_out[0],
-                  mem_address[31:9] == tag_out[1] && valid_out[1],
-                  mem_address[31:9] == tag_out[2] && valid_out[2],
-                  mem_address[31:9] == tag_out[3] && valid_out[3]})
+    unique case ({mem_address[31:8] == tag_out[0] && valid_out[0],
+                  mem_address[31:8] == tag_out[1] && valid_out[1],
+                  mem_address[31:8] == tag_out[2] && valid_out[2],
+                  mem_address[31:8] == tag_out[3] && valid_out[3]})
         default:;
         4'b1000: begin
           HIT = 1'b1;
@@ -144,7 +145,7 @@ always_comb begin
               1'b0:
               //write-back if line is dirty
               
-                cacheline_addr_in = {tag_out[lru_data], mem_address[8:5], 5'b00000};
+                cacheline_addr_in = {tag_out[lru_data], mem_address[7:5], 5'b00000};
             endcase
 
             if (W_CACHE_STATUS[2]) begin //Changed so that the data array is not constantaly being written to

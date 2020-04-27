@@ -28,7 +28,7 @@ IDLE, CHECK, BUFFER, WRITE_TO_MEM, READ_FROM_MEM
 
 
 //update state
-always_ff @(posedge clk) begin //negedge
+always_ff @(negedge clk) begin //negedge
   if (rst)
     state <= IDLE;
   else
@@ -95,7 +95,7 @@ always_comb begin
                 2'b10:
                     lru_in_value = {1'b0,1'b1,lru_data[0]};
                 2'b11:
-                    lru_in_value = {1'b0,1'b10,lru_data[0]};
+                    lru_in_value = {1'b0,1'b0,lru_data[0]};
                 endcase
             end
             if(mem_write_cpu & HIT)
@@ -103,22 +103,22 @@ always_comb begin
                 W_CACHE_STATUS[2] = 1'b1;
                 unique case (way_hit)
                 2'b00: begin
-                    lru_in_value = {1'b1,lru_data[1],1'b1}
+                    lru_in_value = {1'b1,lru_data[1],1'b1};
                     LD_DIRTY[3:0] = 4'b0001;
                     dirty_in_value = 1'b1;
                 end
                 2'b01: begin
-                    lru_in_value = {1'b1,lru_data[1],1'b0}
+                    lru_in_value = {1'b1,lru_data[1],1'b0};
                     LD_DIRTY[3:0] = 4'b0010;
                     dirty_in_value = 1'b1;
                 end
                 2'b10: begin
-                    lru_in_value = {1'b0,1'b1,lru_data[0]}
+                    lru_in_value = {1'b0,1'b1,lru_data[0]};
                     LD_DIRTY[3:0] = 4'b0100;
                     dirty_in_value = 1'b1;
                 end
                 2'b11: begin
-                    lru_in_value = {1'b0,1'b10,lru_data[0]}
+                    lru_in_value = {1'b0,1'b0,lru_data[0]};
                     LD_DIRTY[3:0] = 4'b1000;
                     dirty_in_value = 1'b1;
                 end
