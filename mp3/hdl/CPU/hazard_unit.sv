@@ -18,7 +18,7 @@ begin
 	bubble = 0;
 	instr_op = rv32i_opcode'(instr[6:0]);
 
-	case (id_ex.opcode)
+	case (instr_op)
 		op_lui,op_auipc,op_jal,op_jal:
 		begin
 			rs1 = 0;
@@ -40,7 +40,7 @@ begin
 
 	if (id_ex.opcode == op_load && id_ex.rd != 0)
 	begin
-		if (instr_op == op_store && id_ex.rd == rs2)
+		if (((instr_op == op_store) || (instr_op == op_load) ) && id_ex.rd != rs1)
 		begin
 			/*We don't stall in this case because the 
 			memory forwarding unit will handle it*/
