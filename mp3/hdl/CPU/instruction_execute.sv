@@ -42,7 +42,7 @@ rv32i_word alu_input_1, alu_input_2;
 rv32i_word cmp_input_1, cmp_input_2;
 rv32i_word alu_o_pc_tmp;
 rv32i_word rs2_fwd;
-logic [1:0] addr_offset_next; 
+logic [1:0] addr_offset_next;
 
 alu alu (
   .aluop (ctrl_word_in.aluop),
@@ -121,8 +121,8 @@ always_comb begin
   end
 
   mem_byte_enable = 4'b0000;
-  addr_offset_next = alu_o[1:0]; 
-  if (ctrl_word_in.opcode == op_store || ctrl_word_in.opcode == op_load) 
+  addr_offset_next = alu_o[1:0];
+  if (ctrl_word_in.opcode == op_store || ctrl_word_in.opcode == op_load)
   begin
     case (load_funct3_t'(instruction_in[14:12]))
       lw    : mem_byte_enable = 4'b1111 << addr_offset_next;
@@ -143,13 +143,13 @@ always_ff @(posedge clk) begin
     mem_byte_enable_out <= 0;
     alu_input_1_o <= 0;
     alu_input_2_o <= 0;
-    addr_offset <= 0; 
+    addr_offset <= 0;
   end
   else if (!MA_stall) begin
     ctrl_word_out <= ctrl_word_in;
     instruction_out <= instruction_in;
     PC_out <= PC_in;
-    alu_out <= alu_o;
+    alu_out <= (ctrl_word_in.opcode == op_br) ? alu_out_to_PC : alu_o;
     rs2_out <= rs2_fwd;
     br_en_out <= br_en;
     mem_byte_enable_out <= mem_byte_enable;
