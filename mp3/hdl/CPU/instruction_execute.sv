@@ -113,7 +113,7 @@ always_comb begin
   unique case (fwd_alu[1])
 
     2'b01: begin
-      if (ctrl_word_in.opcode == op_br || ctrl_word_in.opcode == op_jal) begin
+      if (ctrl_word_in.opcode == op_br || ctrl_word_in.opcode == op_jal || ctrl_word_in.opcode == op_store || ctrl_word_in.opcode == op_load || ctrl_word_in.opcode == op_jalr) begin
         alu_input_2 = alu_in_2;
       end
       else begin
@@ -123,7 +123,7 @@ always_comb begin
       rs2_fwd = mem_wb_data;
     end
     2'b10:  begin
-      if (ctrl_word_in.opcode == op_br || ctrl_word_in.opcode == op_jal) begin
+      if (ctrl_word_in.opcode == op_br || ctrl_word_in.opcode == op_jal || ctrl_word_in.opcode == op_store || ctrl_word_in.opcode == op_load || ctrl_word_in.opcode == op_jalr) begin
         alu_input_2 = alu_in_2;
       end
       else begin
