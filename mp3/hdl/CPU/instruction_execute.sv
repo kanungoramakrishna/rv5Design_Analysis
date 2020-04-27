@@ -40,7 +40,7 @@ logic br_en;
 logic [1:0] fwd_alu [1:0];
 rv32i_word alu_input_1, alu_input_2;
 rv32i_word cmp_input_1, cmp_input_2;
-rv32i_word alu_o_pc_tmp;
+// rv32i_word alu_o_pc_tmp;
 rv32i_word rs2_fwd;
 logic [1:0] addr_offset_next;
 
@@ -49,7 +49,7 @@ alu alu (
   .a (alu_input_1),
   .b (alu_input_2),
   .f (alu_o),
-  .alu_out_to_PC (alu_o_pc_tmp)
+  .alu_out_to_PC (alu_out_to_PC)
 );
 
 cmp cmp (
@@ -69,15 +69,29 @@ ex_forward_unit EFU (
 
 
 always_comb begin
+  //PCMUX_sel
+  // alu_out_to_PC = alu_in_1 + alu_in_2;
+  // if (ctrl_word_in.opcode == op_jalr) begin
+  //   alu_out_to_PC = alu_o_pc_tmp;
+  // end
+
+  if(br_en || ctrl_word_in.opcode == op_jal || ctrl_word_in.opcode == op_jalr) begin
+    pcmux_sel = ctrl_word_in.pcmux_sel;
+    br_taken = 1'b1;
+  end
+  else begin
+    br_taken = 1'b0;
+    pcmux_sel = pcmux::pc_plus4;
+  end
 
   // Forwarding Muxes
   unique case (fwd_alu[0])
     2'b01: begin
-      alu_input_1 = mem_wb_data;     // Data from MA/WB
+      alu_input_1 = (br_taken) ? alu_in_1 : mem_wb_data;     // Data from MA/WB
       cmp_input_1 = mem_wb_data;
     end
     2'b10: begin
-      alu_input_1 = alu_out; // Data from EX/MEM
+      alu_input_1 = (br_taken) ? alu_in_1 : alu_out; // Data from EX/MEM
       cmp_input_1 = alu_out;
     end
     default: begin
@@ -89,12 +103,12 @@ always_comb begin
   unique case (fwd_alu[1])
 
     2'b01: begin
-      alu_input_2 = mem_wb_data;     // Data from MA/WB
+      alu_input_2 = (br_taken) ? alu_in_2 : mem_wb_data;     // Data from MA/WB
       cmp_input_2 = mem_wb_data;
       rs2_fwd = mem_wb_data;
     end
     2'b10:  begin
-      alu_input_2 = alu_out; // Data from EX/MEM
+      alu_input_2 = (br_taken) ? alu_in_2 : alu_out; // Data from EX/MEM
       cmp_input_2 = alu_out;
       rs2_fwd = alu_out;
     end
@@ -105,20 +119,6 @@ always_comb begin
     end
   endcase
 
-  //PCMUX_sel
-  alu_out_to_PC = alu_in_1 + alu_in_2;
-  if (ctrl_word_in.opcode == op_jalr) begin
-    alu_out_to_PC = alu_o_pc_tmp;
-  end
-
-  if(br_en || ctrl_word_in.opcode == op_jal || ctrl_word_in.opcode == op_jalr) begin
-    pcmux_sel = ctrl_word_in.pcmux_sel;
-    br_taken = 1'b1;
-  end
-  else begin
-    br_taken = 1'b0;
-    pcmux_sel = pcmux::pc_plus4;
-  end
 
   mem_byte_enable = 4'b0000;
   addr_offset_next = alu_o[1:0];
@@ -149,7 +149,7 @@ always_ff @(posedge clk) begin
     ctrl_word_out <= ctrl_word_in;
     instruction_out <= instruction_in;
     PC_out <= PC_in;
-    alu_out <= (ctrl_word_in.opcode == op_br) ? alu_out_to_PC : alu_o;
+    alu_out <= alu_o;
     rs2_out <= rs2_fwd;
     br_en_out <= br_en;
     mem_byte_enable_out <= mem_byte_enable;
