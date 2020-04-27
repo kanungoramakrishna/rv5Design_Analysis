@@ -26,7 +26,7 @@ logic pc_load;
 rv32i_word pc_in;
 rv32i_word pc_out;
 
-assign pc_load = (!(IF_stall || MA_stall || bubble));			// Always increment (?)
+assign pc_load = (!(IF_stall || MA_stall || bubble) || br_taken);			// Always increment (?)
 assign inst_read = 1'b1;		// Always read (?)
 assign inst_addr = pc_out;
 
@@ -49,6 +49,9 @@ always_ff @(posedge clk) begin
 	if (rst) begin
 		pc_ff <= 32'b0;
 	end
+	// else if (br_taken) begin
+	// 	pc_ff <= pc_ff;
+	// end
 	else if (!(MA_stall || bubble)) begin
 		pc_ff <= pc_out;
 	end
