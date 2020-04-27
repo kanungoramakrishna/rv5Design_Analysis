@@ -87,11 +87,21 @@ always_comb begin
   // Forwarding Muxes
   unique case (fwd_alu[0])
     2'b01: begin
-      alu_input_1 = (br_taken) ? alu_in_1 : mem_wb_data;     // Data from MA/WB
+      if (ctrl_word_in.opcode == op_br || ctrl_word_in.opcode == op_jal) begin
+        alu_input_1 = alu_in_1;
+      end
+      else begin
+        alu_input_1 = mem_wb_data;
+      end
       cmp_input_1 = mem_wb_data;
     end
     2'b10: begin
-      alu_input_1 = (br_taken) ? alu_in_1 : alu_out; // Data from EX/MEM
+      if (ctrl_word_in.opcode == op_br || ctrl_word_in.opcode == op_jal) begin
+        alu_input_1 = alu_in_1;
+      end
+      else begin
+        alu_input_1 = alu_out;
+      end
       cmp_input_1 = alu_out;
     end
     default: begin
@@ -103,12 +113,22 @@ always_comb begin
   unique case (fwd_alu[1])
 
     2'b01: begin
-      alu_input_2 = (br_taken) ? alu_in_2 : mem_wb_data;     // Data from MA/WB
+      if (ctrl_word_in.opcode == op_br || ctrl_word_in.opcode == op_jal) begin
+        alu_input_2 = alu_in_2;
+      end
+      else begin
+        alu_input_2 = mem_wb_data;
+      end
       cmp_input_2 = mem_wb_data;
       rs2_fwd = mem_wb_data;
     end
     2'b10:  begin
-      alu_input_2 = (br_taken) ? alu_in_2 : alu_out; // Data from EX/MEM
+      if (ctrl_word_in.opcode == op_br || ctrl_word_in.opcode == op_jal) begin
+        alu_input_2 = alu_in_2;
+      end
+      else begin
+        alu_input_2 = alu_out;
+      end
       cmp_input_2 = alu_out;
       rs2_fwd = alu_out;
     end
