@@ -12,8 +12,9 @@ input rv32i_word rs2_out,
 input rv32i_word alu_output_in,
 input logic br_en_in,
 input rv32i_word data_rdata_in, //read word from memory
-input data_resp,
+input logic data_resp,
 input logic IF_stall,
+input logic [1:0] addr_offset, 
 
 input rv32i_word alu_input_1_rvfi_in,  //outputs for rvfi monitor
 input rv32i_word alu_input_2_rvfi_in,
@@ -53,7 +54,7 @@ mem_forward_unit MFU
 
 assign data_addr = {alu_output_in[31:2], 2'b00};
 assign data_mbe = mem_byte_enable_in;
-assign data_wdata = (fwd) ? r_data_out : rs2_out;
+assign data_wdata = ((fwd) ? r_data_out : rs2_out) << (8*addr_offset);
 assign data_read = ctrl_word_in.read;
 assign data_write = ctrl_word_in.write;
 
