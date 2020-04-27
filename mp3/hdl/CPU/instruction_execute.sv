@@ -38,6 +38,8 @@ rv32i_word alu_o;
 logic [3:0] mem_byte_enable;
 logic br_en;
 logic [1:0] fwd_alu [1:0];
+logic [1:0] fwd_cmp [1:0];
+logic [1:0] fwd_rs2;
 rv32i_word alu_input_1, alu_input_2;
 rv32i_word cmp_input_1, cmp_input_2;
 // rv32i_word alu_o_pc_tmp;
@@ -63,18 +65,46 @@ ex_forward_unit EFU (
   .id_ex       (ctrl_word_in),
   .ex_mem      (ctrl_word_out),
   .mem_wb      (mem_wb),
-  .fwd_alu     (fwd_alu)
+  .fwd_alu     (fwd_alu),
+  .fwd_cmp     (fwd_cmp),
+  .fwd_rs2     (fwd_rs2)
 );
 
 
 
 always_comb begin
-  //PCMUX_sel
-  // alu_out_to_PC = alu_in_1 + alu_in_2;
-  // if (ctrl_word_in.opcode == op_jalr) begin
-  //   alu_out_to_PC = alu_o_pc_tmp;
-  // end
+  // Forwarding Muxes
+  unique case (fwd_alu[0])
+    default : alu_input_1 = alu_in_1;
+    2'b01   : alu_input_1 = mem_wb_data;
+    2'b10   : alu_input_1 = alu_out; 
+  endcase
 
+  unique case (fwd_alu[1])
+    default : alu_input_2 = alu_in_2;
+    2'b01   : alu_input_2 = mem_wb_data;
+    2'b10   : alu_input_2 = alu_out;
+  endcase
+
+  unique case (fwd_cmp[0])
+    default : cmp_input_1 = rs1_out;
+    2'b01   : cmp_input_1 = mem_wb_data;
+    2'b10   : cmp_input_1 = alu_out; 
+  endcase
+
+  unique case (fwd_cmp[1])
+    default : cmp_input_2 = cmp_in;
+    2'b01   : cmp_input_2 = mem_wb_data;
+    2'b10   : cmp_input_2 = alu_out; 
+  endcase 
+
+  unique case (fwd_rs2)
+    default : rs2_fwd = rs2; 
+    2'b01   : rs2_fwd = mem_wb_data;
+    2'b10   : rs2_fwd = alu_out;
+  endcase 
+
+  //PCMUX_sel
   if(br_en || ctrl_word_in.opcode == op_jal || ctrl_word_in.opcode == op_jalr) begin
     pcmux_sel = ctrl_word_in.pcmux_sel;
     br_taken = 1'b1;
@@ -83,62 +113,6 @@ always_comb begin
     br_taken = 1'b0;
     pcmux_sel = pcmux::pc_plus4;
   end
-
-  // Forwarding Muxes
-  unique case (fwd_alu[0])
-    2'b01: begin
-      if (ctrl_word_in.opcode == op_br || ctrl_word_in.opcode == op_jal) begin
-        alu_input_1 = alu_in_1;
-      end
-      else begin
-        alu_input_1 = mem_wb_data;
-      end
-      cmp_input_1 = mem_wb_data;
-    end
-    2'b10: begin
-      if (ctrl_word_in.opcode == op_br || ctrl_word_in.opcode == op_jal) begin
-        alu_input_1 = alu_in_1;
-      end
-      else begin
-        alu_input_1 = alu_out;
-      end
-      cmp_input_1 = alu_out;
-    end
-    default: begin
-      alu_input_1 = alu_in_1;
-      cmp_input_1 = rs1_out;
-    end
-  endcase
-
-  unique case (fwd_alu[1])
-
-    2'b01: begin
-      if (ctrl_word_in.opcode == op_br || ctrl_word_in.opcode == op_jal || ctrl_word_in.opcode == op_store || ctrl_word_in.opcode == op_load || ctrl_word_in.opcode == op_jalr) begin
-        alu_input_2 = alu_in_2;
-      end
-      else begin
-        alu_input_2 = mem_wb_data;
-      end
-      cmp_input_2 = mem_wb_data;
-      rs2_fwd = mem_wb_data;
-    end
-    2'b10:  begin
-      if (ctrl_word_in.opcode == op_br || ctrl_word_in.opcode == op_jal || ctrl_word_in.opcode == op_store || ctrl_word_in.opcode == op_load || ctrl_word_in.opcode == op_jalr) begin
-        alu_input_2 = alu_in_2;
-      end
-      else begin
-        alu_input_2 = alu_out;
-      end
-      cmp_input_2 = alu_out;
-      rs2_fwd = alu_out;
-    end
-    default: begin
-      alu_input_2 = alu_in_2;
-      cmp_input_2 = cmp_in;
-      rs2_fwd = rs2;
-    end
-  endcase
-
 
   mem_byte_enable = 4'b0000;
   addr_offset_next = alu_o[1:0];
