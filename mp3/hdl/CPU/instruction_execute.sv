@@ -114,52 +114,6 @@ always_comb begin
     pcmux_sel = pcmux::pc_plus4;
   end
 
-<<<<<<< HEAD
-mem_byte_enable = 0;
-
-if (ctrl_word_in.opcode == op_store || ctrl_word_in.opcode == op_load) begin
-  unique case (load_funct3_t'(instruction_in[14:12]))
-    default:
-      mem_byte_enable = 4'b1111;
-    lh, lhu: begin
-      unique case (alu_o[1:0])
-        2'b00:
-          mem_byte_enable = 4'b0011;
-        2'b01:
-          mem_byte_enable = 4'b0110;
-        2'b10:
-          mem_byte_enable = 4'b1100;
-        2'b11:
-          mem_byte_enable = 4'b1000;
-      endcase
-    end
-    lw: begin
-      unique case (alu_o[1:0])
-        2'b00:
-          mem_byte_enable = 4'b1111;
-        2'b01:
-          mem_byte_enable = 4'b1110;
-        2'b10:
-          mem_byte_enable = 4'b1100;
-        2'b11:
-          mem_byte_enable = 4'b1000;
-      endcase
-    end
-    lb, lbu: begin
-      unique case (alu_o[1:0])
-        2'b00:
-          mem_byte_enable = 4'b0001;
-        2'b01:
-          mem_byte_enable = 4'b0010;
-        2'b10:
-          mem_byte_enable = 4'b0100;
-        2'b11:
-          mem_byte_enable = 4'b1000;
-      endcase
-    end
-  endcase
-end
-=======
   mem_byte_enable = 4'b0000;
   addr_offset_next = alu_o[1:0];
   if (ctrl_word_in.opcode == op_store || ctrl_word_in.opcode == op_load)
@@ -170,7 +124,6 @@ end
       lb,lbu: mem_byte_enable = 4'b0001 << addr_offset_next;
     endcase
   end
->>>>>>> master
 end
 
 always_ff @(posedge clk) begin
