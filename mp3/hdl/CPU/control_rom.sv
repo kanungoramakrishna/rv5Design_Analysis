@@ -6,6 +6,7 @@ module control_rom
 (
     input rv32i_word data,
     input [31:0] u_imm,
+    input logic false_NOP,
 
     output rv32i_control_word ctrl,
     output alumux1_sel_t alumux1_sel,
@@ -22,7 +23,7 @@ function void set_defaults();
     /* Default assignments */
     ctrl.opcode = rv32i_opcode'(data[6:0]);
     ctrl.load_regfile = 1'b0;
-    ctrl.rd = data[11:7];
+    ctrl.rd = 0;
     ctrl.cmpop = branch_funct3_t'(funct3);
     ctrl.aluop = alu_add;
     ctrl.read = 1'b0;
@@ -39,6 +40,7 @@ endfunction
 function void loadRegfile(regfilemux::regfilemux_sel_t sel);
     ctrl.load_regfile = 1'b1;
     ctrl.regfilemux_sel = sel;
+    ctrl.rd = data[11:7];
 endfunction
 
 /*signals being set for ALU*/
@@ -65,7 +67,10 @@ always_comb
 begin
     set_defaults();
     /* Assign control signals based on opcode */
-  if (data == 32'b00000000000000000000000000010011) begin
+
+  //do not set control word for inserted NOPs
+  if (false_NOP) begin
+
   end
   else begin
     case (ctrl.opcode)

@@ -15,6 +15,7 @@ module instruction_decode
     input  logic [4:0] rd,
     input  logic load_regfile,
     input logic br_taken,
+    input logic false_NOP,
 
     output rv32i_control_word ctrl_out,
     output rv32i_word instruction_out,
@@ -115,7 +116,7 @@ begin
         rs2_out <= 32'b0;
       end
     //branch recovery
-    else if (br_taken || bubble) begin
+    else if ((!MA_stall)&&(br_taken || bubble)) begin
       PC_out <= 32'b0;
       instruction_out <= 32'h00000013;
       ctrl_out <= 0;
