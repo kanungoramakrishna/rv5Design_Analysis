@@ -49,6 +49,7 @@ rv32i_word alu_input_2_MA_WB;
 rv32i_word instruction_IF_DE;
 rv32i_word PC_IF_DE;
 logic bubble;   // Forwarding
+logic false_NOP;
 
 //Signals between decode and execute
 //connected to registered outputs of decode
@@ -74,6 +75,7 @@ rv32i_word rs2_EXE_MA;
 pcmux_sel_t pcmux_sel;
 rv32i_word alu_out_to_PC;
 logic br_taken;
+logic [1:0] addr_offset;
 
 
 //Signals between memory access and write back
@@ -178,7 +180,8 @@ instruction_execute EXE(
     .pcmux_sel             (pcmux_sel),
     .br_taken              (br_taken),
     .alu_input_1_o         (alu_input_1_EX_MA),
-    .alu_input_2_o         (alu_input_2_EX_MA)
+    .alu_input_2_o         (alu_input_2_EX_MA),
+    .addr_offset           (addr_offset)
 );
 
 memory_access MA(
@@ -201,8 +204,9 @@ memory_access MA(
     .data_mbe                   (data_mbe),
     .data_read                  (data_read),
     .data_write                 (data_write),
-    .alu_input_1_rvfi_in         (alu_input_1_EX_MA),
-    .alu_input_2_rvfi_in         (alu_input_2_EX_MA),
+    .alu_input_1_rvfi_in        (alu_input_1_EX_MA),
+    .alu_input_2_rvfi_in        (alu_input_2_EX_MA),
+    .addr_offset                (addr_offset), 
 
     //Registered Outputs
     .ctrl_word_out              (ctrl_MA_WB ),

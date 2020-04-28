@@ -1,5 +1,5 @@
 
-/tmp/tmp.rRgpeqWPCn/mp3-cp4.s.obj:     file format elf32-littleriscv
+/tmp/tmp.RuSXrsyylS/mp3-cp4.s.obj:     file format elf32-littleriscv
 
 
 Disassembly of section .text:
@@ -4341,4 +4341,4 @@ Disassembly of section .rodata:
 *
 0001840
 Target file /home/ccoron7/ece411/mp2/simulation/modelsim/memory.lst exists.
-Assembled ./mp2/testcode/mp3-cp4.s and wrote memory contents to /home/ccoron7/ece411/mp2/simulation/modelsim/memory.lst
+Assembled ../testcode/mp3-cp4.s and wrote memory contents to /home/ccoron7/ece411/mp2/simulation/modelsim/memory.lst

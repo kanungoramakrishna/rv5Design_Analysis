@@ -29,7 +29,7 @@ IDLE, CHECK, BUFFER, WRITE_TO_MEM, READ_FROM_MEM
 
 
 //update state
-always_ff @(posedge clk) begin //negedge
+always_ff @(negedge clk) begin //negedge
   if (rst)
     state <= IDLE;
   else
