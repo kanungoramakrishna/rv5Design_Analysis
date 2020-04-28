@@ -116,7 +116,7 @@ begin
         rs2_out <= 32'b0;
       end
     //branch recovery
-    else if (br_taken || bubble) begin
+    else if ((!MA_stall)&&(br_taken || bubble)) begin
       PC_out <= 32'b0;
       instruction_out <= 32'h00000013;
       ctrl_out <= 0;
