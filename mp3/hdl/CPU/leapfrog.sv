@@ -20,7 +20,7 @@ always_comb begin
       && ctrl_word_EX.opcode != op_store && ctrl_word_EX.opcode != op_load
       && ctrl_word_EX.opcode != op_auipc && instr != 32'h0000013 && miss) begin
     unique case (ctrl_word_EX.opcode)
-        op_lui, op_auipc, op_jal, op_jal:
+        op_lui, op_auipc, op_jal:
         begin
             rs1_addr = 0;
             rs2_addr = 0;
@@ -29,7 +29,7 @@ always_comb begin
         op_jalr, op_load, op_imm:
         begin
             rs1_addr = instr[19:15];
-            rs1_addr = 0;
+            rs2_addr = 0;
         end
 
         default:

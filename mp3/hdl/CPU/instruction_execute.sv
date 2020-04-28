@@ -32,8 +32,7 @@ module instruction_execute
 
   output rv32i_word alu_input_1_o,  //outputs for rvfi monitor
   output rv32i_word alu_input_2_o,
-  output leap,
-  output rv32i_word alu_frog
+  output leap
 );
 
 rv32i_word alu_o;
@@ -47,6 +46,8 @@ rv32i_word cmp_input_1, cmp_input_2;
 // rv32i_word alu_o_pc_tmp;
 rv32i_word rs2_fwd;
 logic [1:0] addr_offset_next;
+logic miss;
+int unsigned stall_counter;
 
 alu alu (
   .aluop (ctrl_word_in.aluop),
@@ -76,7 +77,7 @@ leapfrog frog (
   .instr        (instruction_in),
   .ctrl_word_EX (ctrl_word_in),
   .ctrl_word_MA (ctrl_word_out),
-  .miss         (MA_stall),
+  .miss         (miss),
   .leap         (leap)
 );
 
@@ -86,7 +87,7 @@ always_comb begin
   unique case (fwd_alu[0])
     default : alu_input_1 = alu_in_1;
     2'b01   : alu_input_1 = mem_wb_data;
-    2'b10   : alu_input_1 = alu_out; 
+    2'b10   : alu_input_1 = alu_out;
   endcase
 
   unique case (fwd_alu[1])
@@ -98,20 +99,20 @@ always_comb begin
   unique case (fwd_cmp[0])
     default : cmp_input_1 = rs1_out;
     2'b01   : cmp_input_1 = mem_wb_data;
-    2'b10   : cmp_input_1 = alu_out; 
+    2'b10   : cmp_input_1 = alu_out;
   endcase
 
   unique case (fwd_cmp[1])
     default : cmp_input_2 = cmp_in;
     2'b01   : cmp_input_2 = mem_wb_data;
-    2'b10   : cmp_input_2 = alu_out; 
-  endcase 
+    2'b10   : cmp_input_2 = alu_out;
+  endcase
 
   unique case (fwd_rs2)
-    default : rs2_fwd = rs2; 
+    default : rs2_fwd = rs2;
     2'b01   : rs2_fwd = mem_wb_data;
     2'b10   : rs2_fwd = alu_out;
-  endcase 
+  endcase
 
   //PCMUX_sel
   if(br_en || ctrl_word_in.opcode == op_jal || ctrl_word_in.opcode == op_jalr) begin
@@ -135,8 +136,16 @@ always_comb begin
   end
 end
 
-assign alu_frog = alu_o;
-assign br_en_frog = br_en;
+always_ff @(posedge clk) begin
+  if (~MA_stall) begin
+    stall_counter <= 0;
+  end
+  else begin
+    stall_counter <= stall_counter + 1;
+  end
+end
+
+assign miss = stall_counter ? 1'b1 : 1'b0;
 
 always_ff @(posedge clk) begin
   if (rst) begin

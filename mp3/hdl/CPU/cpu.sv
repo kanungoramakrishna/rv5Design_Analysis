@@ -102,8 +102,6 @@ logic [4:0] rd;
 logic IF_stall;
 logic MA_stall;
 logic leap;
-rv32i_word alu_frog;
-logic br_en_frog;
 /*****************************************************************************/
 
 instruction_fetch IF(
@@ -206,7 +204,7 @@ memory_access MA(
     .data_write                 (data_write),
     .alu_input_1_rvfi_in        (alu_input_1_EX_MA),
     .alu_input_2_rvfi_in        (alu_input_2_EX_MA),
-    .addr_offset                (addr_offset), 
+    .addr_offset                (addr_offset),
 
     //Registered Outputs
     .ctrl_word_out              (ctrl_MA_WB ),
@@ -231,8 +229,8 @@ write_back WB(
     .mem_byte_enable_in     (mask_MA_WB),
     .w_data_in              (w_data_MA_WB),
     .r_data_in              (r_data_MA_WB),
-    .alu_in                 (leap ? alu_frog : alu_MA_WB),
-    .br_en_in               (leap ? br_en_frog : br_MA_WB),
+    .alu_in                 (leap ? alu_EXE_MA : alu_MA_WB),
+    .br_en_in               (leap ? br_EXE_MA : br_MA_WB),
     .data_addr_in           (data_addr_MA_WB),
 
 
