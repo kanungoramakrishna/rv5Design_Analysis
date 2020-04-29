@@ -99,7 +99,7 @@ always_comb begin
         alu_input_1 = ctrl_word_out.u_imm;
       end
       else if ((ctrl_word_out.opcode == op_imm) &&
-      (ctrl_word_out.cmpop == 3'b100 || ctrl_word_out.cmpop == 3'b110)) begin
+      (instruction_out[14:12] == 3'b010 || instruction_out[14:12] == 3'b011)) begin
         alu_input_1 = br_en_out;
       end
       else begin
@@ -116,7 +116,7 @@ always_comb begin
         alu_input_2 = ctrl_word_out.u_imm;
       end
       else if ((ctrl_word_out.opcode == op_imm) &&
-      (ctrl_word_out.cmpop == 3'b100 || ctrl_word_out.cmpop == 3'b110)) begin
+      (instruction_out[14:12] == 3'b010 || instruction_out[14:12] == 3'b011)) begin
         alu_input_2 = br_en_out;
       end
       else begin
@@ -133,7 +133,7 @@ always_comb begin
         cmp_input_1 = ctrl_word_out.u_imm;
       end
       else if ((ctrl_word_out.opcode == op_imm) &&
-      (ctrl_word_out.cmpop == 3'b100 || ctrl_word_out.cmpop == 3'b110)) begin
+      (instruction_out[14:12] == 3'b010 || instruction_out[14:12] == 3'b011)) begin
         cmp_input_1 = br_en_out;
       end
       else begin
@@ -150,7 +150,7 @@ always_comb begin
         cmp_input_2 = ctrl_word_out.u_imm;
       end
       else if ((ctrl_word_out.opcode == op_imm) &&
-      (ctrl_word_out.cmpop == 3'b100 || ctrl_word_out.cmpop == 3'b110)) begin
+      (instruction_out[14:12] == 3'b010 || instruction_out[14:12] == 3'b011)) begin
         cmp_input_2 = br_en_out;
       end
       else begin
@@ -167,7 +167,7 @@ always_comb begin
         rs2_fwd = ctrl_word_out.u_imm;
       end
       else if ((ctrl_word_out.opcode == op_imm) &&
-      (ctrl_word_out.cmpop == 3'b100 || ctrl_word_out.cmpop == 3'b110)) begin
+      (instruction_out[14:12] == 3'b010 || instruction_out[14:12] == 3'b011)) begin
         rs2_fwd = br_en_out;
       end
       else begin
