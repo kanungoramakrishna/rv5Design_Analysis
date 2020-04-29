@@ -21,7 +21,6 @@ module datacache_datapath #(
     input logic valid_in,
     input logic [1:0] LD_TAG,
     input logic [2:0] W_CACHE_STATUS,
-    output logic cacheline_write,
     output logic [1:0] valid_out,
     output logic [1:0] dirty_out,
     output logic HIT,
@@ -131,7 +130,6 @@ always_comb begin
         3'b001, 3'b011, 3'b111: begin
 
             //evict and write back if line is dirty
-            cacheline_write = (W_CACHE_STATUS[0]&(!W_CACHE_STATUS[1])); // Changed from dirty_out[lru_data]
             cacheline_in = lru_data ? data_arr_out[1] : data_arr_out[0];
 
             unique case (W_CACHE_STATUS[1]) //(Chages from case(dirty_out[lru_data])) and the cases (the 1'b1 annd 1'b0 are switched)
@@ -220,7 +218,6 @@ end
 
 function void set_defaults();
   data_arr_in_value = 0;
-  cacheline_write = 0;
   data_arr_write_en_in = 0;
   HIT = 0;
   way_hit = 0;
