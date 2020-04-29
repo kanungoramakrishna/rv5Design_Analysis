@@ -95,6 +95,16 @@ begin
 end
 
 //synthesis translate_off
+unsigned int leap_counter;
+
+always_ff @(posedge clk) begin
+  if (rst) begin
+    leap_counter <= 0;
+  end
+  else begin
+    leap_counter <= leap_counter + 1;
+  end
+end
 
 RVFIMonPacket packet;
 
