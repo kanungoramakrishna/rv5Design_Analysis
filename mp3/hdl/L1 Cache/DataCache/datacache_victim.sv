@@ -13,7 +13,6 @@ module datacache_victim
     input logic lru_in_victim,
 
     input logic [255:0] data_arr_in,
-    input logic [31:0] tag_in,
 
     input logic [1:0] LD_DIRTY_victim,
     input logic [1:0] LD_VALID_victim,

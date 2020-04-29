@@ -46,6 +46,7 @@ module datacache_control (
 
 logic [31:0] miss_counter;
 logic [31:0] victim_hit_counter;
+logic [31:0] write_back_counter;
 
 enum logic [3:0] {
 IDLE, CHECK, CACHE_TO_VICTIM, VICTIM_TO_CACHE, BUFFER, WRITE_TO_MEM, WRITE_TO_VICTIM, READ_FROM_MEM
@@ -80,6 +81,11 @@ always_ff @(negedge clk) begin //negedge
     victim_hit_counter <= 0;
   else if(state == CACHE_TO_VICTIM)
     victim_hit_counter <= victim_hit_counter + 1;
+
+    if (rst)
+        write_back_counter <= 0;
+    else if((state == WRITE_TO_MEM) && (next_state == WRITE_TO_VICTIM))
+        write_back_counter <= write_back_counter + 1;
 
 end
 
@@ -260,7 +266,6 @@ function void set_defaults();
     pmem_write = 0;
 
     valid_in_victim = 0;
-    dirty_in_victim = 0;
     lru_in_victim = 0;
     dirty_in_victim = 0;
     LD_DIRTY_victim = 0;

@@ -93,7 +93,6 @@ datacache_victim victim(
   .dirty_in_victim  (dirty_in_victim  ),
   .lru_in_victim    (lru_in_victim    ),
   .data_arr_in      (data_from_cache      ),
-  .tag_in           (cacheline_addr_in  ),
   .LD_DIRTY_victim  (LD_DIRTY_victim  ),
   .LD_VALID_victim  (LD_VALID_victim  ),
   .LD_TAG_victim    (LD_TAG_victim    ),
