@@ -58,6 +58,7 @@ rv32i_word CMPin;
 
 rv32i_word reg_a;
 rv32i_word reg_b;
+logic [3:0] pred_idx, pred_idx_ff; 
 
 
 //Regfile
@@ -80,16 +81,19 @@ hazard_unit hazU (
 );
 
 branch_predictor BP (
-    .clk          (clk),
-    .rst          (rst),
+    .clk             (clk),
+    .rst             (rst),
 
-    .pc           (PC),             // IF
-    .instr        (data_),
-    .pred         (pred),
-    .pred_addr    (pred_addr),
+    .pc              (PC),             // IF
+    .op              (rv32i_opcode'(data_[6:0])),
+    .imm             (b_imm),
+    .pred            (pred),
+    .pred_addr       (pred_addr),
 
-    .pred_update, (pred_update),    // EX
-    .pred_taken   (pred_taken)
+    .pred_update     (pred_update),    // EX
+    .pred_taken      (pred_taken),
+    .pred_update_idx (pred_idx_ff),
+    .pred_idx        (pred_idx)
 );
 
 //CW module
@@ -160,6 +164,7 @@ begin
         rs1_out <= reg_a;
         rs2_out <= reg_b;
         pred_ff <= (IF_stall) ? 0 : pred;
+        pred_idx_ff <= pred_idx;
       end
 end
 endmodule
