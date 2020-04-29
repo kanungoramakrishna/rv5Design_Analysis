@@ -21,6 +21,8 @@ module datacache_control (
   output logic mem_resp_cpu
 );
 
+logic [31:0] miss_counter;
+
 //use state machine for control logic with 2 always form
 
 enum logic [3:0] {
@@ -43,6 +45,13 @@ always_ff @(negedge clk) begin //negedge
     state <= IDLE;
   else
     state <= next_state;
+end
+
+always_ff @(negedge clk) begin //negedge
+  if (rst)
+    miss_counter <= 0;
+  else if(state == BUFFER)
+    miss_counter <= miss_counter + 1;
 end
 
 
