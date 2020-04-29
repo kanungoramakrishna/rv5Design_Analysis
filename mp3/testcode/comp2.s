@@ -425,11 +425,3 @@ __muldi3:
 	ret
 	.size	__muldi3, .-__muldi3
 	.ident	"GCC: (GNU) 7.2.0"
-© 2020 GitHub, Inc.
-Help
-Support
-API
-Training
-Blog
-About
-GitHub Enterprise Server 2.20.6
