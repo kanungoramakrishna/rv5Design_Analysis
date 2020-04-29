@@ -22,6 +22,9 @@ module datacache_control (
 );
 
 logic [31:0] miss_counter;
+logic [31:0] write_back_counter;
+
+logic [31:0] clock_counter;
 
 //use state machine for control logic with 2 always form
 
@@ -52,9 +55,21 @@ always_ff @(negedge clk) begin //negedge
     miss_counter <= 0;
   else if(state == BUFFER)
     miss_counter <= miss_counter + 1;
+
+    if (rst)
+        write_back_counter <= 0;
+    else if((state == WRITE_TO_MEM) && (next_state == READ_FROM_MEM))
+        write_back_counter <= write_back_counter + 1;
 end
 
 
+always_ff @(negedge clk)
+begin
+    if(rst)
+        clock_counter<=0;
+    else
+        clock_counter<=clock_counter+1;
+end
 //***next state logic***//
 always_comb begin
     next_state = state;
