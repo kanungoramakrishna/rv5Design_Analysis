@@ -23,7 +23,8 @@ module instcache_datapath #(
     output logic way_hit,
     output logic lru_data,
     output logic [31:0] cacheline_addr_in,
-    output logic [255:0] mem_rdata256
+    output logic [255:0] mem_rdata256,
+    output logic [255:0] cacheline_in
 );
 
 logic [1:0][23:0] tag_out;
@@ -33,8 +34,6 @@ logic [255:0] data_arr_in_value;
 logic [1:0][31:0] data_arr_write_en;
 logic [1:0][31:0] data_arr_write_en_in;
 
-logic [1:0] LD_DIRTY;
-logic dirty_in;
 
 logic LD_LRU;
 logic lru_in;
@@ -110,7 +109,7 @@ always_comb begin
 
             //evict and write back if line is dirty
             //cacheline_write = (W_CACHE_STATUS[0]&(!W_CACHE_STATUS[1])); // Changed from dirty_out[lru_data]
-            //cacheline_in = lru_data ? data_arr_out[1] : data_arr_out[0];
+            cacheline_in = lru_data ? data_arr_out[1] : data_arr_out[0];
 
             unique case (W_CACHE_STATUS[1]) //(Chages from case(dirty_out[lru_data])) and the cases (the 1'b1 annd 1'b0 are switched)
               1'b1:
@@ -188,6 +187,7 @@ function void set_defaults();
   HIT = 0;
   way_hit = 0;
   cacheline_addr_in = 0;
+  cacheline_in = 0;
 endfunction
 
 
