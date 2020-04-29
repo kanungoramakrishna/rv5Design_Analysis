@@ -47,6 +47,15 @@ module datacache_control (
 logic [31:0] miss_counter;
 logic [31:0] victim_hit_counter;
 logic [31:0] write_back_counter;
+logic [31:0] clock_counter;
+
+always_ff @(negedge clk)
+begin
+    if(rst)
+        clock_counter<=0;
+    else
+        clock_counter<=clock_counter+1;
+end
 
 enum logic [3:0] {
 IDLE, CHECK, CACHE_TO_VICTIM, VICTIM_TO_CACHE, BUFFER, WRITE_TO_MEM, WRITE_TO_VICTIM, READ_FROM_MEM
