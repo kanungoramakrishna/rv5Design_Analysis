@@ -23,6 +23,8 @@ localparam bht_size = 2**idx_size;
 logic [1:0] branch_predictor_buffer [bht_size];
 logic [(idx_size-1):0] global_history, global_history_next;
 
+int pred_total, pred_correct; 
+
 assign pred_addr = pc+imm;
 
 always_comb
@@ -51,23 +53,26 @@ begin
 			branch_predictor_buffer[i] <= 2'b00;
 		end
 		global_history <= 0;
+		pred_total   <= 0; 
+		pred_correct <= 0;
 	end else if (pred_update) begin
 		global_history <= global_history_next;
+		pred_total <= pred_total + 1; 
 
 		// Update predictors
 		if (pred_taken) begin
 			unique case (branch_predictor_buffer[pred_update_idx])
-				2'b00: branch_predictor_buffer[pred_update_idx] <= 2'b01;
-				2'b01: branch_predictor_buffer[pred_update_idx] <= 2'b10;
-				2'b10: branch_predictor_buffer[pred_update_idx] <= 2'b11;
-				2'b11: branch_predictor_buffer[pred_update_idx] <= 2'b11;
+				2'b00:       branch_predictor_buffer[pred_update_idx] <= 2'b01;
+				2'b01:       branch_predictor_buffer[pred_update_idx] <= 2'b10;
+				2'b10: begin branch_predictor_buffer[pred_update_idx] <= 2'b11; pred_correct <= pred_correct + 1; end
+				2'b11: begin branch_predictor_buffer[pred_update_idx] <= 2'b11; pred_correct <= pred_correct + 1; end 
 			endcase
 		end else begin
 			unique case (branch_predictor_buffer[pred_update_idx])
-				2'b00: branch_predictor_buffer[pred_update_idx] <= 2'b00;
-				2'b01: branch_predictor_buffer[pred_update_idx] <= 2'b00; 
-				2'b10: branch_predictor_buffer[pred_update_idx] <= 2'b01; 
-				2'b11: branch_predictor_buffer[pred_update_idx] <= 2'b10; 
+				2'b00: begin branch_predictor_buffer[pred_update_idx] <= 2'b00; pred_correct <= pred_correct + 1; end
+				2'b01: begin branch_predictor_buffer[pred_update_idx] <= 2'b00; pred_correct <= pred_correct + 1; end
+				2'b10:       branch_predictor_buffer[pred_update_idx] <= 2'b01; 
+				2'b11:       branch_predictor_buffer[pred_update_idx] <= 2'b10; 
 			endcase
 		end
 	end

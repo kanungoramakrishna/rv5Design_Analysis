@@ -58,7 +58,7 @@ rv32i_word CMPin;
 
 rv32i_word reg_a;
 rv32i_word reg_b;
-logic [3:0] pred_idx, pred_idx_ff; 
+logic [4:0] pred_idx, pred_idx_ff; 
 
 
 //Regfile
@@ -80,7 +80,7 @@ hazard_unit hazU (
     .bubble (bubble)
 );
 
-branch_predictor BP (
+branch_predictor #(5) BP (
     .clk             (clk),
     .rst             (rst),
 
