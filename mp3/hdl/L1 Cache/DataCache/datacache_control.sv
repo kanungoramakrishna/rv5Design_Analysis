@@ -95,7 +95,9 @@ always_comb begin
 
         BUFFER:
         begin
-        if (dirty_out_victim[lru_data_victim] && valid_out_victim[lru_data_victim])
+        if (!valid_out[lru_data])
+            next_state = READ_FROM_MEM;
+        else if (dirty_out_victim[lru_data_victim] && valid_out_victim[lru_data_victim])
             next_state = WRITE_TO_MEM;
         else 
             next_state = WRITE_TO_VICTIM;
