@@ -18,7 +18,8 @@ module L2Cache_Control (
   output logic [1:0] LD_DIRTY,
   output logic [1:0] LD_VALID,
   output logic [2:0] W_CACHE_STATUS,
-  output logic mem_resp_cpu
+  output logic mem_resp_cpu,
+  output logic write_way
 );
 
 //use state machine for control logic with 2 always form
@@ -27,7 +28,7 @@ logic [31:0] miss_counter;
 logic [31:0] write_back_counter;
 
 enum logic [3:0] {
-IDLE, CHECK, BUFFER, WRITE_TO_MEM, READ_FROM_MEM
+IDLE, CHECK, BUFFER, WRITE_TO_MEM, WRITE_1, READ_FROM_MEM
 } state, next_state;
 
 
@@ -51,7 +52,6 @@ always_ff @(negedge clk) begin //negedge
         write_back_counter <= write_back_counter + 1;
 end
 
-
 //***next state logic***//
 always_comb begin
     next_state = state;
@@ -62,11 +62,15 @@ always_comb begin
         end
         CHECK:  
         begin
-        if (!HIT)
+        if(!HIT && mem_write_cpu && (!dirty_out[0] || !dirty_out[1]))
+            next_state = WRITE_1;
+        else if (!HIT)
             next_state = BUFFER;
         else 
             next_state = IDLE; 
         end
+        WRITE_1:
+            next_state = IDLE;
         BUFFER:
         begin
         unique case (dirty_out[lru_data])
@@ -79,7 +83,10 @@ always_comb begin
         WRITE_TO_MEM:
         begin
             if (pmem_resp)
-            next_state = READ_FROM_MEM;
+                if(mem_read_cpu)
+                    next_state = READ_FROM_MEM;
+                else
+                    next_state = WRITE_1;
         end
         READ_FROM_MEM:
         begin
@@ -114,6 +121,7 @@ always_comb begin
             begin
                 W_CACHE_STATUS[2] = 1'b1;
                 lru_in_value = ~way_hit;
+                write_way = way_hit;
                 unique case (way_hit)
                 1'b0: begin
                     LD_DIRTY[1:0] = 2'b01;
@@ -124,6 +132,34 @@ always_comb begin
                     dirty_in_value = 1'b1;
                 end
                 endcase
+            end
+        end
+        WRITE_1:
+        begin
+            if(!HIT && mem_write_cpu)
+            begin
+                if(!dirty_out[lru_data])
+                begin
+                    mem_resp_cpu = 1'b1;
+                    W_CACHE_STATUS[2] = 1'b1;
+                    lru_in_value = !lru_data;
+                    write_way = lru_data;
+                    LD_DIRTY[lru_data] = 1'b1;
+                    dirty_in_value = 1'b1;
+                    LD_TAG[lru_data] = 1'b1;
+                    LD_LRU = 1'b1;
+                    valid_in = 1'b1;
+                end
+                else if((!dirty_out[!lru_data]))
+                begin
+                    mem_resp_cpu = 1'b1;
+                    W_CACHE_STATUS[2] = 1'b1;
+                    write_way = !lru_data;
+                    LD_DIRTY[!lru_data] = 1'b1;
+                    dirty_in_value = 1'b1;
+                    LD_TAG[!lru_data] = 1'b1;
+                    valid_in = 1'b1;
+                end
             end
         end
         WRITE_TO_MEM:
@@ -175,6 +211,7 @@ function void set_defaults();
   LD_VALID = 0;
   W_CACHE_STATUS = 0;
   mem_resp_cpu = 0;
+  write_way = 0;
 endfunction
 
 endmodule : L2Cache_Control

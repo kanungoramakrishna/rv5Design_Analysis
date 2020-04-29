@@ -21,6 +21,10 @@ module instcache_control (
 
 //Logic to keep track if the previous value was a HIT was befor the CPU brings in 
 //the new instruction and the address and tag value changes
+
+logic [31:0] miss_counter;
+
+
 logic HIT_temp;
 always_ff @(posedge clk)
 begin
@@ -35,6 +39,15 @@ end
 enum logic [3:0] {
 IDLE, CHECK, READ_FROM_MEM
 } state, next_state;
+
+always_ff @(negedge clk) begin //negedge
+  if (rst)
+    miss_counter <= 0;
+  else if(pmem_resp)
+    miss_counter <= miss_counter + 1;
+
+
+end
 
 
 //update state

@@ -43,6 +43,7 @@ module L2Cache #(
 
 logic HIT;
 logic way_hit;
+logic write_way;
 logic [1:0] valid_out;
 logic [1:0] dirty_out;
 logic lru_data;
