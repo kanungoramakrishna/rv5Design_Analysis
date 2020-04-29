@@ -77,35 +77,90 @@ always_comb begin
   unique case (fwd_alu[0])
     default : alu_input_1 = alu_in_1;
     2'b01   : alu_input_1 = mem_wb_data;
-    2'b10   : alu_input_1 = alu_out; 
+    2'b10   : begin
+      if (ctrl_word_out.opcode == op_lui) begin
+        alu_input_1 = ctrl_word_out.u_imm;
+      end
+      else if ((ctrl_word_out.opcode == op_imm) &&
+      (ctrl_word_out.cmpop == 3'b100 || ctrl_word_out.cmpop == 3'b110)) begin
+        alu_input_1 = br_en_out;
+      end
+      else begin
+        alu_input_1 = alu_out;
+      end
+    end
   endcase
 
   unique case (fwd_alu[1])
     default : alu_input_2 = alu_in_2;
     2'b01   : alu_input_2 = mem_wb_data;
-    2'b10   : alu_input_2 = alu_out;
+    2'b10   : begin
+      if (ctrl_word_out.opcode == op_lui) begin
+        alu_input_2 = ctrl_word_out.u_imm;
+      end
+      else if ((ctrl_word_out.opcode == op_imm) &&
+      (ctrl_word_out.cmpop == 3'b100 || ctrl_word_out.cmpop == 3'b110)) begin
+        alu_input_2 = br_en_out;
+      end
+      else begin
+        alu_input_2 = alu_out;
+      end
+    end
   endcase
 
   unique case (fwd_cmp[0])
     default : cmp_input_1 = rs1_out;
     2'b01   : cmp_input_1 = mem_wb_data;
-    2'b10   : cmp_input_1 = alu_out; 
+    2'b10   : begin
+      if (ctrl_word_out.opcode == op_lui) begin
+        cmp_input_1 = ctrl_word_out.u_imm;
+      end
+      else if ((ctrl_word_out.opcode == op_imm) &&
+      (ctrl_word_out.cmpop == 3'b100 || ctrl_word_out.cmpop == 3'b110)) begin
+        cmp_input_1 = br_en_out;
+      end
+      else begin
+        cmp_input_1 = alu_out;
+      end
+    end
   endcase
 
   unique case (fwd_cmp[1])
     default : cmp_input_2 = cmp_in;
     2'b01   : cmp_input_2 = mem_wb_data;
-    2'b10   : cmp_input_2 = alu_out; 
-  endcase 
+    2'b10   : begin
+      if (ctrl_word_out.opcode == op_lui) begin
+        cmp_input_2 = ctrl_word_out.u_imm;
+      end
+      else if ((ctrl_word_out.opcode == op_imm) &&
+      (ctrl_word_out.cmpop == 3'b100 || ctrl_word_out.cmpop == 3'b110)) begin
+        cmp_input_2 = br_en_out;
+      end
+      else begin
+        cmp_input_2 = alu_out;
+      end
+    end
+  endcase
 
   unique case (fwd_rs2)
-    default : rs2_fwd = rs2; 
+    default : rs2_fwd = rs2;
     2'b01   : rs2_fwd = mem_wb_data;
-    2'b10   : rs2_fwd = alu_out;
-  endcase 
+    2'b10   : begin
+      if (ctrl_word_out.opcode == op_lui) begin
+        rs2_fwd = ctrl_word_out.u_imm;
+      end
+      else if ((ctrl_word_out.opcode == op_imm) &&
+      (ctrl_word_out.cmpop == 3'b100 || ctrl_word_out.cmpop == 3'b110)) begin
+        rs2_fwd = br_en_out;
+      end
+      else begin
+        rs2_fwd = alu_out;
+      end
+    end
+  endcase
 
   //PCMUX_sel
-  if(br_en || ctrl_word_in.opcode == op_jal || ctrl_word_in.opcode == op_jalr) begin
+  if((br_en && ctrl_word_in.opcode == op_br) || ctrl_word_in.opcode == op_jal || ctrl_word_in.opcode == op_jalr) begin
     pcmux_sel = ctrl_word_in.pcmux_sel;
     br_taken = 1'b1;
   end
