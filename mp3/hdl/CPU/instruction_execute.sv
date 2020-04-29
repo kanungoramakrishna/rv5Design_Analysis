@@ -54,7 +54,7 @@ rv32i_word cmp_input_1, cmp_input_2;
 rv32i_word rs2_fwd;
 logic [1:0] addr_offset_next;
 logic miss;
-int unsigned stall_counter;
+logic stall_counter;
 
 alu alu (
   .aluop (ctrl_word_in.aluop),
@@ -203,7 +203,7 @@ always_ff @(posedge clk) begin
     stall_counter <= 0;
   end
   else begin
-    stall_counter <= stall_counter + 1;
+    stall_counter <= 1'b1;
   end
 end
 
