@@ -14,7 +14,7 @@ module instruction_decode
     input  rv32i_word  rd_in,
     input  logic [4:0] rd,
     input  logic load_regfile,
-    input logic br_taken,
+    input logic br_miss,
     input logic false_NOP,
 
     output rv32i_control_word ctrl_out,
@@ -25,7 +25,15 @@ module instruction_decode
     output rv32i_word CMPin_out,
     output rv32i_word rs1_out,
     output rv32i_word rs2_out,
-    output logic bubble
+    output logic bubble,
+
+    // Prediction
+    output logic pred,                      // IF
+    output rv32i_word pred_addr,
+
+    output logic pred_ff,                   // EX
+    input  logic pred_update, 
+    input  logic pred_taken
 );
 
 
@@ -71,6 +79,19 @@ hazard_unit hazU (
     .bubble (bubble)
 );
 
+branch_predictor BP (
+    .clk          (clk),
+    .rst          (rst),
+
+    .pc           (PC),             // IF
+    .instr        (data_),
+    .pred         (pred),
+    .pred_addr    (pred_addr),
+
+    .pred_update, (pred_update),    // EX
+    .pred_taken   (pred_taken)
+);
+
 //CW module
 control_rom control_rom(.*, .data(data_));
 
@@ -114,9 +135,10 @@ begin
         CMPin_out <= 32'b0;
         rs1_out <= 32'b0;
         rs2_out <= 32'b0;
+        pred_ff <= 0; 
       end
     //branch recovery
-    else if ((!MA_stall)&&(br_taken || bubble)) begin
+    else if ((!MA_stall)&&(br_miss || bubble)) begin
       PC_out <= 32'b0;
       instruction_out <= 32'h00000013;
       ctrl_out <= 0;
@@ -125,6 +147,7 @@ begin
       CMPin_out <= 32'b0;
       rs1_out <= 32'b0;
       rs2_out <= 32'b0;
+      pred_ff <= 0; 
     end
     else if (!MA_stall)
       begin
@@ -136,6 +159,7 @@ begin
         CMPin_out <= CMPin;
         rs1_out <= reg_a;
         rs2_out <= reg_b;
+        pred_ff <= (IF_stall) ? 0 : pred;
       end
 end
 endmodule

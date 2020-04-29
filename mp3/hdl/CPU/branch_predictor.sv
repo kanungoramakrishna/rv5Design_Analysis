@@ -1,22 +1,25 @@
 import rv32i_types::*;
 
-module branch_predictor # (parameter idx_size)
+module branch_predictor # (parameter idx_size=4)
 (
-	// ID I/O
 	input logic clk, rst, 
-	input rv32i_word instr,
-	input rv32i_word pc,
-	output rv32i_word addr, 
+
+	// ID I/O
+	input  rv32i_word pc,
+	input  rv32i_word instr,
+	output logic      pred, 
+	output rv32i_word pred_addr, 
 
 	// EX I/O
-	input 
+	input logic pred_update,
+	input logic pred_taken
 );
 
 localparam bht_size = 2**idx_size; 
 
-logic [1:0] branch_history_table [bht_size];
-rv32i_word  branch_target_buffer [bht_size];
-logic       branch_target_valid  [bht_size]; 
+logic [1:0] branch_predict_buffer [bht_size];
+rv32i_word  branch_address_buffer [bht_size];
+logic       branch_address_valid  [bht_size]; 
 logic [idx_size-1:0] idx;
 
 logic [1:0] prediction;
@@ -27,9 +30,9 @@ logic       target_val;
 always_comb
 begin
 	idx = pc[(idx_size+1):2];
-	prediction = branch_history_table[idx];
-	target     = branch_target_buffer[idx];
-	target_val = branch_target_valid[idx]; 
+	prediction = branch_predict_buffer[idx];
+	target     = branch_address_buffer[idx];
+	target_val = branch_address_valid[idx]; 
 end
 // Update counters during EX
 always_ff @(posedge clk)
@@ -37,9 +40,9 @@ begin
 	if (rst)
 	begin
 		for (int i=0; i<bht_size; i++) begin
-			branch_history_table[i] <= 0;
-			branch_target_buffer[i] <= 0;
-			branch_target_valid [i] <= 0;  
+			branch_predict_buffer[i] <= 0;
+			branch_address_buffer[i] <= 0;
+			branch_address_valid [i] <= 0;  
 		end
 	end
 	else if (/*TODO*/)
