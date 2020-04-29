@@ -57,6 +57,15 @@ enum logic [3:0] {
 IDLE, CHECK, CACHE_TO_VICTIM, VICTIM_TO_CACHE, WRITE_TO_VICTIM, READ_FROM_MEM
 } state, next_state;
 
+always_ff @(negedge clk) begin //negedge
+  if (rst)
+    miss_counter <= 0;
+  else if(pmem_resp)
+    miss_counter <= miss_counter + 1;
+
+
+end
+
 
 //update state
 always_ff @(negedge clk) begin //negedge
