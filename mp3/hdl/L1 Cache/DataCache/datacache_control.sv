@@ -44,6 +44,9 @@ module datacache_control (
 
 //use state machine for control logic with 2 always form
 
+logic [31:0] miss_counter;
+logic [31:0] victim_hit_counter;
+
 enum logic [3:0] {
 IDLE, CHECK, CACHE_TO_VICTIM, VICTIM_TO_CACHE, BUFFER, WRITE_TO_MEM, WRITE_TO_VICTIM, READ_FROM_MEM
 } state, next_state;
@@ -65,6 +68,21 @@ always_ff @(negedge clk) begin //negedge
   else
     state <= next_state;
 end
+
+
+always_ff @(negedge clk) begin //negedge
+  if (rst)
+    miss_counter <= 0;
+  else if(state == BUFFER)
+    miss_counter <= miss_counter + 1;
+
+  if (rst)
+    victim_hit_counter <= 0;
+  else if(state == CACHE_TO_VICTIM)
+    victim_hit_counter <= victim_hit_counter + 1;
+
+end
+
 
 
 //***next state logic***//
