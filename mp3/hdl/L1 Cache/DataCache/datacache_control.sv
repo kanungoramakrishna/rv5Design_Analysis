@@ -42,10 +42,7 @@ module datacache_control (
     input logic way_hit_victim
 );
 
-logic [31:0] miss_counter;
-logic [31:0] write_back_counter;
 
-logic [31:0] clock_counter;
 
 //use state machine for control logic with 2 always form
 
