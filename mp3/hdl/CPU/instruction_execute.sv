@@ -47,7 +47,7 @@ logic [1:0] fwd_cmp [1:0];
 logic [1:0] fwd_rs2;
 rv32i_word alu_input_1, alu_input_2;
 rv32i_word cmp_input_1, cmp_input_2;
-rv32i_word alu_o_pc_tmp;
+rv32i_word alu_out_to_PC_tmp;
 rv32i_word rs2_fwd;
 logic [1:0] addr_offset_next;
 

@@ -127,7 +127,7 @@ instruction_fetch IF(
 
     // Branch Prediction
     .pred       (pred),
-    .pred_addr  (pred_addr),
+    .pred_addr  (pred_addr)
 
 );
 

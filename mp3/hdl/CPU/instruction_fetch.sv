@@ -32,6 +32,7 @@ rv32i_word pc_out;
 
 logic temp_branch;
 rv32i_word temp_pc;
+rv32i_word pc_out_tmp; 
 
 // assign pc_load = (!(IF_stall || MA_stall || bubble) || (!IF_stall && br_miss) || (!IF_stall && temp_branch) );			// Always increment (?)
 assign pc_load = (!(IF_stall || MA_stall || bubble)); 
@@ -43,9 +44,10 @@ pc_register PC (
 	.rst  (rst),
 	.load (pc_load),
 	.in   ((temp_branch) ? temp_pc : pc_in),
-	.out  ((pred) ? pred_addr : pc_out)
+	.out  (pc_out_tmp)
 );
 
+assign pc_out = (pred) ? pred_addr : pc_out_tmp; 
 
 
 // NOTE : The ff logic is split up  in order to
