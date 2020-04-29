@@ -26,7 +26,7 @@ begin
     fwd_alu[1] = 2'b00;
     fwd_cmp[0] = 2'b00;
     fwd_cmp[1] = 2'b00;
-    fwd_rs2    = 2'b00; 
+    fwd_rs2    = 2'b00;
 
     case (id_ex.opcode)
         op_lui,op_auipc,op_jal,op_jal:
@@ -124,10 +124,12 @@ begin
                 if (mem_wb.rd == id_ex_rs1)
                 begin
                     fwd_alu[0] = 2'b01;
+                    fwd_cmp[0] = 2'b01;
                 end
                 if (mem_wb.rd == id_ex_rs2)
                 begin
                     fwd_alu[1] = 2'b01;
+                    fwd_cmp[1] = 2'b01;
                 end
             end
             if (ex_mem.load_regfile && ex_mem.rd != 0)
@@ -135,10 +137,12 @@ begin
                 if (ex_mem.rd == id_ex_rs1)
                 begin
                     fwd_alu[0] = 2'b10;
+                    fwd_cmp[0] = 2'b10;
                 end
                 if (ex_mem.rd == id_ex_rs2)
                 begin
                     fwd_alu[1] = 2'b10;
+                    fwd_cmp[1] = 2'b10;
                 end
             end
         end
