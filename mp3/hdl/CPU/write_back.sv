@@ -3,9 +3,11 @@ import pcmux::*;
 
 module write_back
 (
+    input clk,
     input rv32i_word PC_in,
     input rv32i_word PC_plus4_in,
     input rv32i_word instruction_in,
+    input rv32i_word instruction_frog,
     input rv32i_control_word ctrl_word_in,
     input [3:0] mem_byte_enable_in,
     input rv32i_word r_data_in,
@@ -13,6 +15,7 @@ module write_back
     input rv32i_word alu_in,
     input rv32i_word br_en_in,
     input rv32i_word data_addr_in,
+    input logic leap,
 
     //To regfile (ID)
     output logic load_regfile,
@@ -21,15 +24,23 @@ module write_back
 );
 
 logic [31:0] regfilemux_out;
+rv32i_word instruction_out;
+
+always_ff @(posedge clk) begin
+  if (leap) begin
+    instruction_out <= instruction_in;
+  end
+end
 
 //To ID to write to registers
-assign load_regfile = ctrl_word_in.load_regfile;
+
 assign rd_in = regfilemux_out;
 assign rd = ctrl_word_in.rd;
 
 //Regfile MUX
 always_comb
 begin
+  load_regfile = ctrl_word_in.load_regfile;
     unique case (ctrl_word_in.regfilemux_sel)
         regfilemux::alu_out  : regfilemux_out =  alu_in;
         regfilemux::br_en    : regfilemux_out = br_en_in;
@@ -78,6 +89,9 @@ begin
             end
         default:;
     endcase
+    if (instruction_in == instruction_out && !leap) begin
+      load_regfile = 1'b0;
+    end
 end
 
 //synthesis translate_off

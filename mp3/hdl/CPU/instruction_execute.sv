@@ -32,6 +32,13 @@ module instruction_execute
 
   output rv32i_word alu_input_1_o,  //outputs for rvfi monitor
   output rv32i_word alu_input_2_o,
+
+  output rv32i_word alu_frog,
+  output rv32i_control_word ctrl_word_frog,
+  output rv32i_word instruction_frog,
+  output rv32i_word pc_frog,
+  output rv32i_word pc_plus4_frog,
+  output logic br_en_frog,
   output leap
 );
 
@@ -171,6 +178,14 @@ always_ff @(posedge clk) begin
     alu_input_1_o <= alu_input_1;
     alu_input_2_o <= alu_input_2;
     addr_offset <= addr_offset_next;
+  end
+  else begin
+    alu_frog <= alu_o;
+    ctrl_word_frog <= ctrl_word_in;
+    instruction_frog <= instruction_in;
+    pc_frog <= PC_in;
+    pc_plus4_frog <= PC_in + 4;
+    br_en_frog <= br_en;
   end
 end
 endmodule

@@ -10,6 +10,7 @@ module instruction_fetch
 	input  rv32i_word  alu_out,		// From WB
 	input  logic       br_taken,
 	input  logic       bubble,      // From ID
+	input logic 			 leap,
 	output rv32i_word  pc_ff,
 	output rv32i_word  instr_ff,
 
@@ -29,8 +30,8 @@ rv32i_word pc_out;
 logic temp_branch;
 rv32i_word temp_pc;
 
-assign pc_load = (!(IF_stall || MA_stall || bubble) || (!IF_stall && br_taken) || (!IF_stall && temp_branch) );			// Always increment (?)
-assign inst_read = 1'b1;		// Always read (?)
+assign pc_load = (!(IF_stall || MA_stall || bubble) || (!IF_stall && br_taken) || (!IF_stall && temp_branch) || (!IF_stall && leap));
+assign inst_read = 1'b1;		// Always read
 assign inst_addr = pc_out;
 
 pc_register PC (
@@ -55,7 +56,7 @@ always_ff @(posedge clk) begin
 	// else if (br_taken) begin
 	// 	pc_ff <= pc_ff;
 	// end
-	else if (!(MA_stall || bubble)) begin
+	else if (!(MA_stall || bubble) || leap) begin
 		pc_ff <= pc_out;
 	end
 
@@ -70,7 +71,7 @@ always_ff @(posedge clk) begin
 		instr_ff <= 32'h00000013;
 		false_NOP <= 1'b1;
 	end
-	else if (!(MA_stall)) begin
+	else if (!(MA_stall) || leap) begin
 		instr_ff <= inst_rdata;
 		false_NOP <= 1'b0;
 	end

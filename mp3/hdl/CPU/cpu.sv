@@ -102,6 +102,13 @@ logic [4:0] rd;
 logic IF_stall;
 logic MA_stall;
 logic leap;
+rv32i_word alu_frog;
+rv32i_control_word ctrl_word_frog;
+rv32i_word instruction_frog;
+rv32i_word pc_frog;
+rv32i_word pc_plus4_frog;
+logic br_en_frog;
+
 /*****************************************************************************/
 
 instruction_fetch IF(
@@ -222,15 +229,18 @@ memory_access MA(
 );
 
 write_back WB(
-	.PC_in                    (leap ? PC_ID_EXE : PC_MA_WB),
-    .PC_plus4_in            (leap ? PC_ID_EXE + 4 : PC_plus4_MA_WB),
-    .instruction_in         (leap ? instruction_ID_EXE : instruction_MA_WB),
-    .ctrl_word_in           (leap ? ctrl_ID_EXE : ctrl_MA_WB ),
+    .clk                    (clk),
+    .leap                   (leap),
+	  .PC_in                  (leap ? pc_frog : PC_MA_WB),
+    .PC_plus4_in            (leap ? pc_plus4_frog : PC_plus4_MA_WB),
+    .instruction_in         (instruction_MA_WB),
+    .instruction_frog       (instruction_frog),
+    .ctrl_word_in           (leap ? ctrl_word_frog : ctrl_MA_WB ),
     .mem_byte_enable_in     (mask_MA_WB),
     .w_data_in              (w_data_MA_WB),
     .r_data_in              (r_data_MA_WB),
-    .alu_in                 (leap ? alu_EXE_MA : alu_MA_WB),
-    .br_en_in               (leap ? br_EXE_MA : br_MA_WB),
+    .alu_in                 (leap ? alu_frog : alu_MA_WB),
+    .br_en_in               (leap ? br_en_frog : br_MA_WB),
     .data_addr_in           (data_addr_MA_WB),
 
 

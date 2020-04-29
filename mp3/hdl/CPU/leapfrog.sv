@@ -39,7 +39,7 @@ always_comb begin
         end
     endcase
 
-    leap = rs1_addr == ctrl_word_MA.rd || rs2_addr == ctrl_word_MA.rd ? 1'b0 : 1'b1;
+    leap = (rs1_addr == ctrl_word_MA.rd) || (rs2_addr == ctrl_word_MA.rd) || ~miss ? 1'b0 : 1'b1;
 
   end
 end
