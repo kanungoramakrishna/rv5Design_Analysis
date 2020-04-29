@@ -9,6 +9,7 @@ module L2Cache_Datapath #(
 (
     input logic clk,
     input logic rst,
+    input logic write_way,
     input logic [255:0] mem_wdata256,
     input logic [255:0] cacheline_out,
     input logic [31:0] mem_address,
@@ -112,8 +113,8 @@ always_comb begin
         default:;
         //CPU write to cache, evict inactive
         3'b100: begin
-          data_arr_write_en_in[0] = !(way_hit);
-          data_arr_write_en_in[1] = way_hit;
+          data_arr_write_en_in[0] = !(write_way);
+          data_arr_write_en_in[1] = write_way;
           data_arr_in_value = mem_wdata256;
         end
         //if must handle miss
