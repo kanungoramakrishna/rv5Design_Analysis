@@ -9,15 +9,13 @@ loop:
   addi x4, x4, 16
   addi x2, x2, 1
   add x3, x2, x2
-  sw x3, argument0  # dcache miss
+  la x1, argument0
+  sw x3,  0(x1)  # dcache miss
   add x2, x4, x2    # leap here
   add x2, x0, x2    # leap here
-  add x2, x4, x2    # leap here
   add x3, x3, x3    # stall here
   add x2, x0, x2
   add x2, x4, x2
-
-
 halt:
   beq x2, x2, halt
 
