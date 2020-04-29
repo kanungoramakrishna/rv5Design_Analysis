@@ -23,14 +23,13 @@ localparam bht_size = 2**idx_size;
 
 logic [1:0] branch_predictor_buffer [bht_size];
 logic [(idx_size-1):0] global_history, global_history_next;
-logic [idx_size-1:0] idx;
 logic [1:0] prediction; 
 
 assign pred_addr = pc+imm;
 
 always_comb
 begin
-	idx = pc[(idx_size+1):2] ^ global_history;
+	pred_idx = pc[(idx_size+1):2] ^ global_history;
 	if (op == op_br) begin
 		case (branch_predictor_buffer[idx])
 			2'b00: pred = 0; 
