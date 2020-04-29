@@ -30,8 +30,8 @@ logic pc_load;
 rv32i_word pc_in;
 rv32i_word pc_out;
 
-logic temp_branch;
-rv32i_word temp_pc;
+logic temp_branch, temp_pred;
+rv32i_word temp_pc, temp_pred_pc;
 rv32i_word pc_out_tmp; 
 
 // assign pc_load = (!(IF_stall || MA_stall || bubble) || (!IF_stall && br_miss) || (!IF_stall && temp_branch) );			// Always increment (?)
@@ -47,7 +47,7 @@ pc_register PC (
 	.out  (pc_out_tmp)
 );
 
-assign pc_out = (pred) ? pred_addr : pc_out_tmp; 
+// assign pc_out = (pred) ? pred_addr : pc_out_tmp; 
 
 
 // NOTE : The ff logic is split up  in order to
@@ -82,14 +82,14 @@ end
 end
 
 always_comb begin
-	if (inst_resp)
-	begin
-		IF_stall = 1'b0;
-	end
+	IF_stall = (inst_resp) ? 1'b0 : 1'b1;
+
+	if (pred)
+		pc_out = pred_addr;
+	else if (temp_pred)
+		pc_out = temp_pred_pc;
 	else
-	begin
-		IF_stall = 1'b1;
-	end
+		pc_out = pc_out_tmp;
 
 	unique case (pcmux_sel)
 		pcmux::pc_plus4 : pc_in = pc_out + 4;
@@ -115,6 +115,18 @@ begin
 		temp_pc <= 0;
 	else if (br_miss)
 		temp_pc <= pc_in;
+	
+	if (rst)
+		temp_pred <= 1'b0;
+	else if (IF_stall && pred)
+		temp_pred <=1'b1;
+	else if (temp_pred && !IF_stall)
+		temp_pred <=1'b0;
+	
+	if (rst)
+		temp_pred_pc <= 0;
+	else if (pred)
+		temp_pred_pc <= pc_out;
 	
 
 

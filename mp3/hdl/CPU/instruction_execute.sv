@@ -127,7 +127,7 @@ always_comb begin
   end
 
   // Update Predictor accordingly
-  pred_update = (ctrl_word_in.opcode == op_br) ? 1 : 0;
+  pred_update = (ctrl_word_in.opcode == op_br) ? 1'b1 : 1'b0;
   pred_taken  = br_en; 
 
   mem_byte_enable = 4'b0000;
@@ -135,9 +135,10 @@ always_comb begin
   if (ctrl_word_in.opcode == op_store || ctrl_word_in.opcode == op_load)
   begin
     case (load_funct3_t'(instruction_in[14:12]))
-      lw    : mem_byte_enable = 4'b1111 << addr_offset_next;
-      lh,lhu: mem_byte_enable = 4'b0011 << addr_offset_next;
-      lb,lbu: mem_byte_enable = 4'b0001 << addr_offset_next;
+      lw     : mem_byte_enable = 4'b1111 << addr_offset_next;
+      lh,lhu : mem_byte_enable = 4'b0011 << addr_offset_next;
+      lb,lbu : mem_byte_enable = 4'b0001 << addr_offset_next;
+		default: mem_byte_enable = 4'b0000; 
     endcase
   end
 end

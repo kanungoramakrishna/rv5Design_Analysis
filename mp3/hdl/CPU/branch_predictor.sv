@@ -6,7 +6,6 @@ module branch_predictor # (parameter idx_size=4)
 
 	// ID I/O
 	input  rv32i_word   pc,
-	input  rv32i_word   instr,
 	input  rv32i_opcode op,
 	input  rv32i_word   imm,
 	output logic        pred, 
@@ -15,15 +14,14 @@ module branch_predictor # (parameter idx_size=4)
 	// EX I/O
 	input  logic                pred_update,
 	input  logic                pred_taken,
-	input  logic [idx_size-1:0] pred_update_idx
-	output logic [idx_size-1:0] pred_idx,
+	input  logic [idx_size-1:0] pred_update_idx,
+	output logic [idx_size-1:0] pred_idx
 );
 
 localparam bht_size = 2**idx_size; 
 
 logic [1:0] branch_predictor_buffer [bht_size];
 logic [(idx_size-1):0] global_history, global_history_next;
-logic [1:0] prediction; 
 
 assign pred_addr = pc+imm;
 
@@ -31,7 +29,7 @@ always_comb
 begin
 	pred_idx = pc[(idx_size+1):2] ^ global_history;
 	if (op == op_br) begin
-		case (branch_predictor_buffer[idx])
+		case (branch_predictor_buffer[pred_idx])
 			2'b00: pred = 0; 
 			2'b01: pred = 0; 
 			2'b10: pred = 1; 
@@ -50,10 +48,9 @@ always_ff @(posedge clk)
 begin
 	if (rst) begin
 		for (int i=0; i<bht_size; i++) begin
-			branch_predict_buffer[i] <= 0;
-			branch_address_buffer[i] <= 0;
-			branch_address_valid [i] <= 0;  
+			branch_predictor_buffer[i] <= 2'b00;
 		end
+		global_history <= 0;
 	end else if (pred_update) begin
 		global_history <= global_history_next;
 
@@ -74,7 +71,5 @@ begin
 			endcase
 		end
 	end
-begin
-
 end
 endmodule

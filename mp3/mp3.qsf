@@ -41,7 +41,7 @@ set_global_assignment -name DEVICE EP2AGX45DF25I3
 set_global_assignment -name TOP_LEVEL_ENTITY mp3
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION 18.1.0
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "22:40:21  APRIL 19, 2020"
-set_global_assignment -name LAST_QUARTUS_VERSION "18.1.0 Standard Edition"
+set_global_assignment -name LAST_QUARTUS_VERSION "18.1.0 Lite Edition"
 set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
 set_global_assignment -name MIN_CORE_JUNCTION_TEMP "-40"
 set_global_assignment -name MAX_CORE_JUNCTION_TEMP 100
@@ -67,6 +67,8 @@ set_global_assignment -name EDA_TEST_BENCH_FILE hvl/shadow_memory.sv -section_id
 set_global_assignment -name EDA_TEST_BENCH_FILE hvl/source_tb.sv -section_id top
 set_global_assignment -name EDA_TEST_BENCH_FILE hvl/tb_itf.sv -section_id top
 set_global_assignment -name EDA_TEST_BENCH_FILE hvl/top.sv -section_id top
+set_global_assignment -name SYSTEMVERILOG_FILE hdl/CPU/branch_predictor.sv
+set_global_assignment -name SYSTEMVERILOG_FILE hdl/CPU/instruction_fetch.sv
 set_global_assignment -name SYSTEMVERILOG_FILE hdl/CPU/mem_forward_unit.sv
 set_global_assignment -name SYSTEMVERILOG_FILE hdl/CPU/hazard_unit.sv
 set_global_assignment -name SYSTEMVERILOG_FILE hdl/CPU/ex_forward_unit.sv
@@ -90,7 +92,6 @@ set_global_assignment -name SYSTEMVERILOG_FILE hdl/CPU/write_back.sv
 set_global_assignment -name SYSTEMVERILOG_FILE hdl/CPU/regfile.sv
 set_global_assignment -name SYSTEMVERILOG_FILE hdl/CPU/pc_reg.sv
 set_global_assignment -name SYSTEMVERILOG_FILE hdl/CPU/memory_access.sv
-set_global_assignment -name SYSTEMVERILOG_FILE hdl/CPU/intruction_fetch.sv
 set_global_assignment -name SYSTEMVERILOG_FILE hdl/CPU/instruction_execute.sv
 set_global_assignment -name SYSTEMVERILOG_FILE hdl/CPU/instruction_decode.sv
 set_global_assignment -name SYSTEMVERILOG_FILE hdl/CPU/cpu.sv

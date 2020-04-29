@@ -96,6 +96,10 @@ branch_predictor BP (
     .pred_idx        (pred_idx)
 );
 
+// assign pred = 0; 
+// assign pred_addr = 0;
+// assign pred_idx = 0; 
+
 //CW module
 control_rom control_rom(.*, .data(data_));
 
@@ -163,7 +167,8 @@ begin
         CMPin_out <= CMPin;
         rs1_out <= reg_a;
         rs2_out <= reg_b;
-        pred_ff <= (IF_stall) ? 0 : pred;
+        // pred_ff <= (IF_stall) ? 1'b0 : pred;
+        pred_ff <= pred;
         pred_idx_ff <= pred_idx;
       end
 end
