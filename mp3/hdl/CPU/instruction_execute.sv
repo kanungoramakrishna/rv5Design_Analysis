@@ -84,7 +84,7 @@ leapfrog frog (
   .instr        (instruction_in),
   .ctrl_word_EX (ctrl_word_in),
   .ctrl_word_MA (ctrl_word_out),
-  .miss         (miss),
+  .miss         (MA_stall),
   .leap         (leap)
 );
 
@@ -199,17 +199,6 @@ always_comb begin
 end
 
 always_ff @(posedge clk) begin
-  if (~MA_stall) begin
-    stall_counter <= 0;
-  end
-  else begin
-    stall_counter <= 1'b1;
-  end
-end
-
-assign miss = stall_counter ? 1'b1 : 1'b0;
-
-always_ff @(posedge clk) begin
   if (rst) begin
     ctrl_word_out <= 0;
     instruction_out <= 0;
@@ -221,6 +210,12 @@ always_ff @(posedge clk) begin
     alu_input_1_o <= 0;
     alu_input_2_o <= 0;
     addr_offset <= 0;
+    alu_frog <= 0;
+    ctrl_word_frog <= 0;
+    instruction_frog <= 0;
+    pc_frog <= 0;
+    pc_plus4_frog <= 0 + 4;
+    br_en_frog <= 0;
   end
   else if (!MA_stall) begin
     ctrl_word_out <= ctrl_word_in;
@@ -234,7 +229,7 @@ always_ff @(posedge clk) begin
     alu_input_2_o <= alu_input_2;
     addr_offset <= addr_offset_next;
   end
-  else begin
+  else if (leap) begin
     alu_frog <= alu_o;
     ctrl_word_frog <= ctrl_word_in;
     instruction_frog <= instruction_in;

@@ -170,7 +170,7 @@ instruction_execute EXE(
     .rs2                   (rs2_ID_EXE),
     .cmp_in                (CMPin_ID_EXE),
     .ctrl_word_in          (ctrl_ID_EXE  ),
-    .mem_wb                (ctrl_MA_WB),
+    .mem_wb                (leap ? ctrl_word_frog : ctrl_MA_WB),
     .mem_wb_data           (rd_in),
 
     //Registered outputs

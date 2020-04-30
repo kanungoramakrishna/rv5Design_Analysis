@@ -14,7 +14,7 @@ input logic br_en_in,
 input rv32i_word data_rdata_in, //read word from memory
 input logic data_resp,
 input logic IF_stall,
-input logic [1:0] addr_offset, 
+input logic [1:0] addr_offset,
 
 input rv32i_word alu_input_1_rvfi_in,  //outputs for rvfi monitor
 input rv32i_word alu_input_2_rvfi_in,
@@ -99,6 +99,12 @@ always_ff @(posedge clk) begin
 
     alu_input_1_rvfi_o <= alu_input_1_rvfi_in;
     alu_input_2_rvfi_o <= alu_input_2_rvfi_in;
+  end
+  else begin
+    ctrl_word_out <= 0;
+    instruction_out <= 32'h0000013;
+    PC_out <= 0;
+    PC_plus4_out <= 0;
   end
 end
 endmodule

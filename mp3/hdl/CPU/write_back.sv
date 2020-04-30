@@ -4,6 +4,7 @@ import pcmux::*;
 module write_back
 (
     input clk,
+    input rst,
     input rv32i_word PC_in,
     input rv32i_word PC_plus4_in,
     input rv32i_word instruction_in,
@@ -24,23 +25,15 @@ module write_back
 );
 
 logic [31:0] regfilemux_out;
-rv32i_word instruction_out;
-
-always_ff @(posedge clk) begin
-  if (leap) begin
-    instruction_out <= instruction_in;
-  end
-end
 
 //To ID to write to registers
-
+assign load_regfile = ctrl_word_in.load_regfile;
 assign rd_in = regfilemux_out;
 assign rd = ctrl_word_in.rd;
 
 //Regfile MUX
 always_comb
 begin
-  load_regfile = ctrl_word_in.load_regfile;
     unique case (ctrl_word_in.regfilemux_sel)
         regfilemux::alu_out  : regfilemux_out =  alu_in;
         regfilemux::br_en    : regfilemux_out = br_en_in;
@@ -89,19 +82,16 @@ begin
             end
         default:;
     endcase
-    if (instruction_in == instruction_out && !leap) begin
-      load_regfile = 1'b0;
-    end
 end
 
 //synthesis translate_off
-unsigned int leap_counter;
+int unsigned leap_counter;
 
-always_ff @(posedge clk) begin
+always_ff @(negedge clk) begin
   if (rst) begin
     leap_counter <= 0;
   end
-  else begin
+  else if (leap && load_regfile) begin
     leap_counter <= leap_counter + 1;
   end
 end
