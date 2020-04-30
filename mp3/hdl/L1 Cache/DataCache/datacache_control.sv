@@ -134,8 +134,6 @@ always_comb begin
             next_state = CHECK; 
         end
         CACHE_TO_VICTIM:
-            next_state = VICTIM_TO_CACHE;
-        VICTIM_TO_CACHE:
             next_state = CHECK;
 
 
@@ -146,16 +144,14 @@ always_comb begin
         else if (dirty_out_victim[lru_data_victim] && valid_out_victim[lru_data_victim])
             next_state = WRITE_TO_MEM;
         else 
-            next_state = WRITE_TO_VICTIM;
+            next_state = READ_FROM_MEM;
         end
 
         WRITE_TO_MEM:
         begin
             if (pmem_resp)
-            next_state = WRITE_TO_VICTIM;
-        end
-        WRITE_TO_VICTIM:
             next_state = READ_FROM_MEM;
+        end
         READ_FROM_MEM:
         begin
             if (pmem_resp)
@@ -203,7 +199,7 @@ always_comb begin
         end
         CACHE_TO_VICTIM:
         begin
-            W_CACHE_STATUS[0] = 1'b1;
+            W_CACHE_STATUS = 3'b101;
             valid_in_victim = valid_out[lru_data];
             dirty_in_victim = dirty_out[lru_data];
             lru_in_victim = !way_hit_victim;
@@ -212,10 +208,7 @@ always_comb begin
             LD_TAG_victim[way_hit_victim] = 1'b1;
             LD_DATA_victim[way_hit_victim]= 1'b1;
             LD_LRU_victim = 1'b1;
-        end
-        VICTIM_TO_CACHE:
-        begin
-            W_CACHE_STATUS = 3'b111;
+
             LD_TAG[lru_data] = 1'b1;
             valid_in = 1'b1;
             unique case (lru_data)
@@ -227,12 +220,37 @@ always_comb begin
             LD_DIRTY_in[lru_data] = 1'b1;
             dirty_in_value = dirty_buffer;
         end
-
-
+        BUFFER:
+        begin
+            if(!(dirty_out_victim[lru_data_victim] && valid_out_victim[lru_data_victim]))
+            begin
+                W_CACHE_STATUS[0] = 1'b1;
+                valid_in_victim = valid_out[lru_data];
+                dirty_in_victim = dirty_out[lru_data];
+                lru_in_victim = !lru_data_victim;
+                LD_DIRTY_victim[lru_data_victim] =1'b1 ;
+                LD_VALID_victim[lru_data_victim] = 1'b1;
+                LD_TAG_victim[lru_data_victim] = 1'b1;
+                LD_DATA_victim[lru_data_victim]= 1'b1;
+                LD_LRU_victim = 1'b1;
+            end
+        end
         WRITE_TO_MEM:
         begin
         if (!pmem_resp)
             pmem_write = 1'b1;
+        else
+        begin
+            W_CACHE_STATUS[0] = 1'b1;
+            valid_in_victim = valid_out[lru_data];
+            dirty_in_victim = dirty_out[lru_data];
+            lru_in_victim = !lru_data_victim;
+            LD_DIRTY_victim[lru_data_victim] =1'b1 ;
+            LD_VALID_victim[lru_data_victim] = 1'b1;
+            LD_TAG_victim[lru_data_victim] = 1'b1;
+            LD_DATA_victim[lru_data_victim]= 1'b1;
+            LD_LRU_victim = 1'b1;
+        end
         end
         WRITE_TO_VICTIM:
         begin

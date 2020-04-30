@@ -105,13 +105,13 @@ always_comb begin
             next_state = CACHE_TO_VICTIM;
         else if(HIT_temp)
             next_state = CHECK;    
-        else if (!valid_out[lru_data])
-            next_state = READ_FROM_MEM;
+       /* else if (!valid_out[lru_data])
+            next_state = READ_FROM_MEM;*/
         else
-            next_state = WRITE_TO_VICTIM;
+            next_state = READ_FROM_MEM;
         end
         CACHE_TO_VICTIM:
-            next_state = VICTIM_TO_CACHE;
+            next_state = CHECK;
         VICTIM_TO_CACHE:
             next_state = CHECK;
         WRITE_TO_VICTIM:
@@ -145,16 +145,40 @@ always_comb begin
                     lru_in_value = 1'b1;
                 endcase
             end
+            if (next_state == READ_FROM_MEM)
+            begin
+                if(valid_out[lru_data])
+                begin
+                    W_CACHE_STATUS[0] = 1'b1;
+                    valid_in_victim = valid_out[lru_data];
+                    lru_in_victim = !lru_data_victim;
+                    LD_VALID_victim[lru_data_victim] = 1'b1;
+                    LD_TAG_victim[lru_data_victim] = 1'b1;
+                    LD_DATA_victim[lru_data_victim]= 1'b1;
+                    LD_LRU_victim = 1'b1;
+                end
+            end
         end
         CACHE_TO_VICTIM:
         begin
-            W_CACHE_STATUS[0] = 1'b1;
+            W_CACHE_STATUS = 3'b101;
             valid_in_victim = valid_out[lru_data];
             lru_in_victim = !way_hit_victim;
             LD_VALID_victim[way_hit_victim] = 1'b1;
             LD_TAG_victim[way_hit_victim] = 1'b1;
             LD_DATA_victim[way_hit_victim]= 1'b1;
             LD_LRU_victim = 1'b1;
+
+            
+            LD_TAG[lru_data] = 1'b1;
+            valid_in = 1'b1;
+            unique case (lru_data)
+            1'b1:
+                LD_VALID[1:0] = 2'b10;
+            1'b0:
+                LD_VALID[1:0] = 2'b01;
+            endcase
+
         end
         VICTIM_TO_CACHE:
         begin
@@ -168,16 +192,6 @@ always_comb begin
                 LD_VALID[1:0] = 2'b01;
             endcase
 
-        end
-        WRITE_TO_VICTIM:
-        begin
-            W_CACHE_STATUS[0] = 1'b1;
-            valid_in_victim = valid_out[lru_data];
-            lru_in_victim = !lru_data_victim;
-            LD_VALID_victim[lru_data_victim] = 1'b1;
-            LD_TAG_victim[lru_data_victim] = 1'b1;
-            LD_DATA_victim[lru_data_victim]= 1'b1;
-            LD_LRU_victim = 1'b1;
         end
         READ_FROM_MEM:
         begin

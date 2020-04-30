@@ -127,7 +127,7 @@ always_comb begin
           data_arr_in_value = mem_wdata256;
         end
         //if must handle miss
-        3'b001, 3'b011, 3'b111: begin
+        3'b001, 3'b011, 3'b111, 3'b101: begin
 
             //evict and write back if line is dirty
             cacheline_in = lru_data ? data_arr_out[1] : data_arr_out[0];

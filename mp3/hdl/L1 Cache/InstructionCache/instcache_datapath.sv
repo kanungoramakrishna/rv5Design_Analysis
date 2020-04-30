@@ -105,7 +105,7 @@ always_comb begin
     unique case (W_CACHE_STATUS)
         default:;
         //if must handle miss
-        3'b001, 3'b011, 3'b111: begin
+        3'b001, 3'b011, 3'b111,3'b101: begin
 
             //evict and write back if line is dirty
             //cacheline_write = (W_CACHE_STATUS[0]&(!W_CACHE_STATUS[1])); // Changed from dirty_out[lru_data]

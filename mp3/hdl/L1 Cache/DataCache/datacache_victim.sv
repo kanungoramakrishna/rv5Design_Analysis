@@ -102,7 +102,7 @@ always_comb begin
     
 end
 
-always_ff @(negedge clk)
+always_ff @(posedge clk)
 begin
     if (rst)
     begin
