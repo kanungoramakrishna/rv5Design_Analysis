@@ -27,11 +27,16 @@ module instruction_execute
   output rv32i_word rs2_out,
   output logic br_en_out,
   output logic [3:0] mem_byte_enable_out,
-  output logic br_taken,
+  output logic br_miss,
   output logic [1:0] addr_offset,
 
   output rv32i_word alu_input_1_o,  //outputs for rvfi monitor
-  output rv32i_word alu_input_2_o
+  output rv32i_word alu_input_2_o,
+
+  // Predictor I/O
+  input  logic pred,
+  output logic pred_update,
+  output logic pred_taken
 );
 
 rv32i_word alu_o;
@@ -42,7 +47,7 @@ logic [1:0] fwd_cmp [1:0];
 logic [1:0] fwd_rs2;
 rv32i_word alu_input_1, alu_input_2;
 rv32i_word cmp_input_1, cmp_input_2;
-// rv32i_word alu_o_pc_tmp;
+rv32i_word alu_out_to_PC_tmp;
 rv32i_word rs2_fwd;
 logic [1:0] addr_offset_next;
 
@@ -51,7 +56,7 @@ alu alu (
   .a (alu_input_1),
   .b (alu_input_2),
   .f (alu_o),
-  .alu_out_to_PC (alu_out_to_PC)
+  .alu_out_to_PC (alu_out_to_PC_tmp)
 );
 
 cmp cmp (
@@ -160,23 +165,35 @@ always_comb begin
   endcase
 
   //PCMUX_sel
-  if((br_en && ctrl_word_in.opcode == op_br) || ctrl_word_in.opcode == op_jal || ctrl_word_in.opcode == op_jalr) begin
+  alu_out_to_PC = alu_out_to_PC_tmp;
+  if(ctrl_word_in.opcode == op_jal || ctrl_word_in.opcode == op_jalr) begin
     pcmux_sel = ctrl_word_in.pcmux_sel;
-    br_taken = 1'b1;
-  end
-  else begin
-    br_taken = 1'b0;
+    br_miss = 1'b1;
+  end else if (ctrl_word_in.opcode == op_br && (br_en != pred)) begin           // Mispredict
+    alu_out_to_PC = (pred) ? (PC_in+4) : alu_out_to_PC_tmp;                     // Need to insert PC <- oldPC+4
+    pcmux_sel = ctrl_word_in.pcmux_sel;
+    br_miss = 1'b1;
+  // end else if (ctrl_word_in.opcode == op_br && pred && pred_addr != alu_output) // Predict but wrong address
+  //   pcmux_sel = ctrl_word_in.pcmux_sel;                                         // Need to insert PC <- oldPC+imm
+  //   br_miss = 1'b1;
+  end else begin
+    br_miss = 1'b0;
     pcmux_sel = pcmux::pc_plus4;
   end
+
+  // Update Predictor accordingly
+  pred_update = (ctrl_word_in.opcode == op_br) ? 1'b1 : 1'b0;
+  pred_taken  = br_en; 
 
   mem_byte_enable = 4'b0000;
   addr_offset_next = alu_o[1:0];
   if (ctrl_word_in.opcode == op_store || ctrl_word_in.opcode == op_load)
   begin
     case (load_funct3_t'(instruction_in[14:12]))
-      lw    : mem_byte_enable = 4'b1111 << addr_offset_next;
-      lh,lhu: mem_byte_enable = 4'b0011 << addr_offset_next;
-      lb,lbu: mem_byte_enable = 4'b0001 << addr_offset_next;
+      lw     : mem_byte_enable = 4'b1111 << addr_offset_next;
+      lh,lhu : mem_byte_enable = 4'b0011 << addr_offset_next;
+      lb,lbu : mem_byte_enable = 4'b0001 << addr_offset_next;
+		default: mem_byte_enable = 4'b0000; 
     endcase
   end
 end
