@@ -40,7 +40,55 @@ rv32i_word mem_address_copy;
 logic [255:0] mem_rdata256;
 logic [31:0] mem_byte_enable256;
 
+logic [31:0] cacheline_addr_in;
+
 assign mem_address_copy = mem_address;
+
+// Victim cache signals
+logic [255:0] data_from_cache;
+logic [255:0] data_to_cache;
+logic [255:0] victim_data;
+
+assign pmem_address = cacheline_addr_in;
+assign data_to_cache = pmem_resp ? pmem_rdata : victim_data;
+
+
+
+logic valid_in_victim;
+logic dirty_in_victim;
+logic lru_in_victim;
+logic [1:0] LD_DIRTY_victim;
+logic [1:0] LD_VALID_victim;
+logic [1:0] LD_TAG_victim;
+logic [1:0] LD_DATA_victim;
+
+logic LD_LRU_victim;
+
+logic [1:0] valid_out_victim;
+logic [1:0] dirty_out_victim;
+logic lru_data_victim;
+
+logic HIT_victim;
+logic way_hit_victim;
+
+instruction_victim inst_victim(
+  .*,
+  .mem_address      (mem_address      ),
+  .evict_address    (cacheline_addr_in),
+  .data_to_cache    (victim_data    ),
+  .valid_in_victim  (valid_in_victim  ),
+  .lru_in_victim    (lru_in_victim    ),
+  .data_arr_in      (data_from_cache  ),
+  .LD_VALID_victim  (LD_VALID_victim  ),
+  .LD_TAG_victim    (LD_TAG_victim    ),
+  .LD_DATA_victim   (LD_DATA_victim   ),
+  .LD_LRU_victim    (LD_LRU_victim    ),
+  .valid_out_victim (valid_out_victim ),
+  .lru_data_victim  (lru_data_victim  ),
+  .HIT_victim       (HIT_victim       ),
+  .way_hit_victim   (way_hit_victim   )
+);
+
 
 instcache_control control (
   .*,
@@ -52,8 +100,9 @@ instcache_control control (
 instcache_datapath datapath (
   .*,
   .mem_address (mem_address_copy),
-  .cacheline_addr_in (pmem_address),
-  .cacheline_out (pmem_rdata)
+  .cacheline_addr_in (cacheline_addr_in),
+  .cacheline_out (data_to_cache),
+  .cacheline_in(data_from_cache)
 );
 
 instcache_bus_adapter bus_adapter (
