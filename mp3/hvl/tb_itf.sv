@@ -1,12 +1,18 @@
 `ifndef TB_ITF_SV
 `define TB_ITF_SV
-`timescale 1ns/10ps
+
+`define FREQUENCY_MHZ 100.42
+`define FREQUENCY (`FREQUENCY_MHZ * 1000000)
+`define PERIOD_NS (1000000000/`FREQUENCY)
+`define PERIOD_CLK (`PERIOD_NS / 2)
+
+`timescale 1ns/1ps
 
 interface tb_itf();
 
     /* Generate Clock */
     bit clk, rst;
-    always #5 clk = clk === 1'b0;
+    always #(`PERIOD_CLK) clk = clk === 1'b0;
 
     /* Needed to validate correctness */
     logic [31:0] registers[32];
@@ -37,9 +43,9 @@ interface tb_itf();
     logic mem_read;
     logic mem_write;
     logic [31:0] mem_addr;
-    logic [63:0] mem_wdata; //////////////////////////////////Changed from 63:0
+    logic [63:0] mem_wdata;
     logic mem_resp;
-    logic [63:0] mem_rdata;//////////////////////////////////Changed from 63:0
+    logic [63:0] mem_rdata;
 
     /* Mailbox for memory path */
     mailbox #(string) path_mb;
@@ -61,8 +67,7 @@ interface tb_itf();
         output inst_sm_error, data_sm_error;
     endclocking
 
-    
-    //Magic Memory
+    /* Magic Memory */
     clocking mmcb @(negedge clk);
         input read_a = inst_read, address_a = inst_addr, read_b = data_read,
               write = data_write, wmask = data_mbe, address_b = data_addr,
@@ -70,8 +75,7 @@ interface tb_itf();
         output resp_a = inst_resp, rdata_a = inst_rdata, resp_b = data_resp,
                rdata_b = data_rdata;
     endclocking
-    
-    
+
     modport mem(clocking mcb, ref path_mb);
     modport magic_mem(clocking mmcb, ref path_mb);
     modport sm(clocking smcb, ref path_mb);
