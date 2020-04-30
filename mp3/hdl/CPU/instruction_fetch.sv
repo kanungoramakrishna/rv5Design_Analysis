@@ -30,7 +30,7 @@ rv32i_word pc_out;
 logic temp_branch;
 rv32i_word temp_pc;
 
-assign pc_load = (!(IF_stall || MA_stall || bubble) || (!IF_stall && br_taken) || (!IF_stall && temp_branch) || (!IF_stall && leap));
+assign pc_load = (!(IF_stall || MA_stall || bubble) || (!IF_stall && br_taken) || (!IF_stall && temp_branch));
 assign inst_read = 1'b1;		// Always read
 assign inst_addr = pc_out;
 
@@ -56,7 +56,7 @@ always_ff @(posedge clk) begin
 	// else if (br_taken) begin
 	// 	pc_ff <= pc_ff;
 	// end
-	else if (!(MA_stall || bubble) || leap) begin
+	else if (!(MA_stall || bubble)) begin
 		pc_ff <= pc_out;
 	end
 
@@ -67,11 +67,11 @@ always_ff @(posedge clk) begin
 	end
 	else if (!(bubble))
 	begin
-	if ((IF_stall &&  (!(MA_stall))) || br_taken || temp_branch) begin
+	if ((IF_stall &&  (!(MA_stall))) || br_taken || temp_branch || (IF_stall && leap)) begin
 		instr_ff <= 32'h00000013;
 		false_NOP <= 1'b1;
 	end
-	else if (!(MA_stall) || leap) begin
+	else if (!(MA_stall)) begin
 		instr_ff <= inst_rdata;
 		false_NOP <= 1'b0;
 	end
