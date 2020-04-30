@@ -9,6 +9,8 @@
 `define USE_SHADOW_MEMORY 1
 `define USE_RVFI_MONITOR 1
 
+`include "tb_itf.sv"
+
 module source_tb(
     tb_itf.magic_mem magic_mem_itf,
     tb_itf.mem mem_itf,
@@ -27,29 +29,6 @@ end
 
 /**************************** Halting Conditions *****************************/
 int timeout = 100000000;
-logic [31:0] rs1_data, rs2_data;
-int unsigned stall_counter;
-
-always @(posedge tb_itf.clk) begin
-  if (dut.cpu.MA.MA_stall == 0) begin
-    stall_counter <= 0;
-  end
-  else begin
-    stall_counter <= stall_counter + 1'b1;
-  end
-end
-
-always @(negedge tb_itf.clk) begin
-  if (stall_counter > 0) begin
-    rs1_data <= rs1_data;
-    rs2_data <= rs2_data;
-  end
-  else begin
-    rs1_data <= dut.cpu.WB.packet.rs1_addr ? dut.cpu.ID.regfile.data[dut.cpu.WB.packet.rs1_addr] : 0;
-    rs2_data <= dut.cpu.WB.packet.rs2_addr ? dut.cpu.ID.regfile.data[dut.cpu.WB.packet.rs2_addr] : 0;
-  end
-end
-
 
 always @(posedge tb_itf.clk) begin
     if (rvfi.halt)
@@ -68,13 +47,16 @@ always @(rvfi.errcode iff (rvfi.errcode != 0)) begin
 end
 
 /************************** End Halting Conditions ***************************/
+`define PARAM_RESPONSE_NS 50 * 10
+`define PARAM_RESPONSE_CYCLES $ceil(`PARAM_RESPONSE_NS / `PERIOD_NS)
+`define PAGE_RESPONSE_CYCLES $ceil(`PARAM_RESPONSE_CYCLES / 2.0)
 
 generate
     if (`MEMORY == `MAGIC_MEM) begin : memory
         magic_memory_dp mem(magic_mem_itf);
     end
     else if (`MEMORY == `PARAM_MEM) begin : memory
-        ParamMemory #(50, 25, 4, 256, 512) mem(mem_itf);
+        ParamMemory #(`PARAM_RESPONSE_CYCLES, `PAGE_RESPONSE_CYCLES, 4, 256, 512) mem(mem_itf);
     end
 endgenerate
 
@@ -85,31 +67,31 @@ generate
 
     if (`USE_RVFI_MONITOR) begin
         /* Instantiate RVFI Monitor */
-        riscv_formal_monitor_rv32imc monitor (
-          .clock (itf.clk),
-          .reset (itf.rst),
-          .rvfi_valid (rvfi.commit),
-          .rvfi_order (rvfi.order),
-          .rvfi_insn (dut.cpu.WB.packet.instruction),
-          .rvfi_trap(1'b0),
-          .rvfi_halt(rvfi.halt),
-          .rvfi_intr(1'b0),
-          .rvfi_mode(2'b00),
-          .rvfi_rs1_addr(dut.cpu.WB.packet.rs1_addr),
-          .rvfi_rs2_addr(dut.cpu.WB.packet.rs2_addr),
-          .rvfi_rs1_rdata(rs1_data),
-          .rvfi_rs2_rdata(rs2_data),
-          .rvfi_rd_addr(dut.cpu.ID.load_regfile ? dut.cpu.WB.packet.rd_addr : 5'h0),
-          .rvfi_rd_wdata(monitor.rvfi_rd_addr ? dut.cpu.WB.packet.rd_data : 0),
-          .rvfi_pc_rdata(dut.cpu.WB.packet.pc_rdata),
-          .rvfi_pc_wdata(dut.cpu.WB.packet.pc_wdata),
-          .rvfi_mem_addr(dut.cpu.WB.packet.mem_addr),
-          .rvfi_mem_rmask(dut.cpu.WB.packet.mem_rmask),
-          .rvfi_mem_wmask(dut.cpu.WB.packet.mem_wmask),
-          .rvfi_mem_rdata(dut.cpu.WB.packet.mem_rdata),
-          .rvfi_mem_wdata(dut.cpu.WB.packet.mem_wdata),
-          .rvfi_mem_extamo(1'b0),
-          .errcode(rvfi.errcode)
+        riscv_formal_monitor_rv32imc monitor(
+            .clock(rvfi.clk),
+            .reset(rvfi.rst),
+            .rvfi_valid(rvfi.commit),
+            .rvfi_order(rvfi.order),
+            .rvfi_insn(rvfi.inst),
+            .rvfi_trap(rvfi.trap),
+            .rvfi_halt(rvfi.halt),
+            .rvfi_intr(1'b0),
+            .rvfi_mode(2'b00),
+            .rvfi_rs1_addr(rvfi.rs1_addr),
+            .rvfi_rs2_addr(rvfi.rs2_addr),
+            .rvfi_rs1_rdata(rvfi.rs1_addr ? rvfi.rs1_rdata : 0),
+            .rvfi_rs2_rdata(rvfi.rs2_addr ? rvfi.rs2_rdata : 0),
+            .rvfi_rd_addr(rvfi.load_regfile ? rvfi.rd_addr : 0),
+            .rvfi_rd_wdata(rvfi.load_regfile ? rvfi.rd_wdata : 0),
+            .rvfi_pc_rdata(rvfi.pc_rdata),
+            .rvfi_pc_wdata(rvfi.pc_wdata),
+            .rvfi_mem_addr({rvfi.mem_addr[31:2], 2'b0}),
+            .rvfi_mem_rmask(rvfi.mem_rmask),
+            .rvfi_mem_wmask(rvfi.mem_wmask),
+            .rvfi_mem_rdata(rvfi.mem_rdata),
+            .rvfi_mem_wdata(rvfi.mem_wdata),
+            .rvfi_mem_extamo(1'b0),
+            .errcode(rvfi.errcode)
         );
     end
 endgenerate

@@ -14,7 +14,7 @@ module instruction_decode
     input  rv32i_word  rd_in,
     input  logic [4:0] rd,
     input  logic load_regfile,
-    input logic br_taken,
+    input logic br_miss,
     input logic false_NOP,
 
     output rv32i_control_word ctrl_out,
@@ -25,7 +25,15 @@ module instruction_decode
     output rv32i_word CMPin_out,
     output rv32i_word rs1_out,
     output rv32i_word rs2_out,
-    output logic bubble
+    output logic bubble,
+
+    // Prediction
+    output logic pred,                      // IF
+    output rv32i_word pred_addr,
+
+    output logic pred_ff,                   // EX
+    input  logic pred_update, 
+    input  logic pred_taken
 );
 
 
@@ -50,6 +58,7 @@ rv32i_word CMPin;
 
 rv32i_word reg_a;
 rv32i_word reg_b;
+logic [3:0] pred_idx, pred_idx_ff; 
 
 
 //Regfile
@@ -70,6 +79,26 @@ hazard_unit hazU (
     .id_ex   (ctrl_out),
     .bubble (bubble)
 );
+
+branch_predictor #(4) BP (
+    .clk             (clk),
+    .rst             (rst),
+
+    .pc              (PC),             // IF
+    .op              (rv32i_opcode'(data_[6:0])),
+    .imm             (b_imm),
+    .pred            (pred),
+    .pred_addr       (pred_addr),
+
+    .pred_update     (pred_update),    // EX
+    .pred_taken      (pred_taken),
+    .pred_update_idx (pred_idx_ff),
+    .pred_idx        (pred_idx)
+);
+
+// assign pred = 0; 
+// assign pred_addr = 0;
+// assign pred_idx = 0; 
 
 //CW module
 control_rom control_rom(.*, .data(data_));
@@ -114,9 +143,10 @@ begin
         CMPin_out <= 32'b0;
         rs1_out <= 32'b0;
         rs2_out <= 32'b0;
+        pred_ff <= 0; 
       end
     //branch recovery
-    else if ((!MA_stall)&&(br_taken || bubble)) begin
+    else if ((!MA_stall)&&(br_miss || bubble)) begin
       PC_out <= 32'b0;
       instruction_out <= 32'h00000013;
       ctrl_out <= 0;
@@ -125,6 +155,7 @@ begin
       CMPin_out <= 32'b0;
       rs1_out <= 32'b0;
       rs2_out <= 32'b0;
+      pred_ff <= 0; 
     end
     else if (!MA_stall)
       begin
@@ -136,6 +167,9 @@ begin
         CMPin_out <= CMPin;
         rs1_out <= reg_a;
         rs2_out <= reg_b;
+        // pred_ff <= (IF_stall) ? 1'b0 : pred;
+        pred_ff <= pred;
+        pred_idx_ff <= pred_idx;
       end
 end
 endmodule

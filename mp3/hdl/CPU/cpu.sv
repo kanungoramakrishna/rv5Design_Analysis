@@ -74,7 +74,7 @@ rv32i_word rs2_EXE_MA;
 
 pcmux_sel_t pcmux_sel;
 rv32i_word alu_out_to_PC;
-logic br_taken;
+logic br_miss;
 logic [1:0] addr_offset;
 
 
@@ -101,6 +101,10 @@ logic [4:0] rd;
 //stall, these are .*
 logic IF_stall;
 logic MA_stall;
+
+// branch prediction
+logic pred, pred_ff, pred_update, pred_taken;
+rv32i_word pred_addr;
 /*****************************************************************************/
 
 instruction_fetch IF(
@@ -109,7 +113,7 @@ instruction_fetch IF(
     .rst        (rst ),
     .pcmux_sel  (pcmux_sel ),
     .alu_out    (alu_out_to_PC),
-    .br_taken   (br_taken),
+    .br_miss   (br_miss),
     .bubble     (bubble),    // Forwarding
 
     .inst_resp  (inst_resp),
@@ -119,7 +123,11 @@ instruction_fetch IF(
 
     //Registered outputs
     .pc_ff      (PC_IF_DE ),
-    .instr_ff   (instruction_IF_DE )
+    .instr_ff   (instruction_IF_DE ),
+
+    // Branch Prediction
+    .pred       (pred),
+    .pred_addr  (pred_addr)
 
 );
 
@@ -133,7 +141,7 @@ instruction_decode ID(
     .rd_in  (rd_in ),
     .rd     (rd  ),
     .load_regfile   (load_regfile  ),
-    .br_taken       (br_taken),
+    .br_miss       (br_miss),
 
     //Registered outputs
     .ctrl_out       (ctrl_ID_EXE),
@@ -145,7 +153,14 @@ instruction_decode ID(
     .rs1_out        (rs1_ID_EXE    ),
     .rs2_out        (rs2_ID_EXE    ),
 
-    .bubble         (bubble)    // Forwarding
+    .bubble         (bubble),    // Forwarding
+
+    // Branch Prediction
+    .pred           (pred),
+    .pred_addr      (pred_addr),
+    .pred_ff        (pred_ff), 
+    .pred_update    (pred_update), 
+    .pred_taken     (pred_taken)
 );
 
 
@@ -175,10 +190,16 @@ instruction_execute EXE(
     .mem_byte_enable_out   (mask_EXE_MA),
     .alu_out_to_PC         (alu_out_to_PC),
     .pcmux_sel             (pcmux_sel),
-    .br_taken              (br_taken),
+    .br_miss               (br_miss),
     .alu_input_1_o         (alu_input_1_EX_MA),
     .alu_input_2_o         (alu_input_2_EX_MA),
-    .addr_offset           (addr_offset)
+    .addr_offset           (addr_offset),
+
+    // Branch Prediction
+    .pred                  (pred_ff),
+    .pred_update           (pred_update),
+    .pred_taken            (pred_taken)
+
 );
 
 memory_access MA(
