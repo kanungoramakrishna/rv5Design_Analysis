@@ -25,16 +25,13 @@ module L2Cache #(
     output logic mem_resp
     /*
     input logic clk,
-
     input logic rst,
     input logic [26:0] address_arbiter_to_l2;
     input logic read_arbiter_to_l2;
     input logic write_arbiter_to_l2;
     input logic [255:0] data_arbiter_to_l2;
-
     output logic mem_resp;
     output logic [255:0] data_L2_to_arbiter,
-
     output logic [255:0] data_L2_to_cacheline,
     output logic [31:0]  address_L2_to_cacheline,
     */
@@ -43,6 +40,7 @@ module L2Cache #(
 
 logic HIT;
 logic way_hit;
+logic write_way;
 logic [1:0] valid_out;
 logic [1:0] dirty_out;
 logic lru_data;
